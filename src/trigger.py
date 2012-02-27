@@ -13,16 +13,15 @@ from libs.gsmcom.Atcom import Atcom
 from interfaces.Manager import Manager
 from interfaces.Web import Web
 
-class sms:
+class trigger:
 
-##
-# Brief: Just initializes the system. Bind socket and stuff :>
-# Param: addres The IP to listen for connections
-# Param: port The port to listen for connections
-# Param: log The path to the log file
-##
 	def __init__(self, address, port, log, gsm_com_type):
-
+		"""
+		Brief: Just initializes the system. Bind socket and stuff :>
+		Param: addres The IP to listen for connections
+		Param: port The port to listen for connections
+		Param: log The path to the log file
+		"""
 		self.address = address
 		self.port = port
 		self.channel = '' 
@@ -48,11 +47,11 @@ class sms:
 		except:
 			print "Failed to create one of the objects."
 			sys.exit(0)
-##
-# Brief: Call all necessary functions and goes into the connection loop
-##
-	def start(self):
 
+	def start(self):
+		"""
+		Brief: Call all necessary functions and goes into the connection loop
+		"""
 		self.log.LOG(LOG_INFO, "sms", "Starting the system.")
 		self.checkConnection()
 		self.log.LOG(LOG_INFO, "sms", "System started.")
@@ -62,12 +61,12 @@ class sms:
 		self.lookForConnection()
 		self.channel.close
 		sys.exit(0)
-##
-# Brief: Set the system connection and bind to
-# Return: OK if everything went fine; Or halt the system if unsucess
-##		
-	def checkConnection (self):
 
+	def checkConnection (self):
+		"""
+		Brief: Set the system connection and bind to
+		Return: OK if everything went fine; Or halt the system if unsucess
+		"""
 		try:
 			self.channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -95,11 +94,11 @@ class sms:
 
 		else:
 			self.log.LOG(LOG_INFO, "sms", "Tables of the database are OK.") 
-##
-# Brief: Wait for subsytems connections (web interface, asterisk, alarms)
-##
-	def lookForConnection(self):
 
+	def lookForConnection(self):
+		"""
+		Brief: Wait for subsytems connections (web interface, asterisk, alarms)
+		"""
 		while True:
 			try:
 				(client_channel, address) = self.channel.accept()
@@ -124,46 +123,46 @@ class sms:
 			except socket.error, emsg:
 				self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Failed to receive client message. Error: %s" % emsg)
 				continue
-##
-# Brief: Select client action package
-# Param: cmsg The cient message package
-# Return: OK if everything went right; INVALID if the client ID does not exist; ERROR if an error ocurred
-##
+
 	def processMessage (self, cmsg, client_channel):
+		"""
+		Brief: Select client action package
+		Param: cmsg The cient message package
+		Return: OK if everything went right; INVALID if the client ID does not exist; ERROR if an error ocurred
+		"""
+		CID = self.shared.splitTag(cmsg, TAG_ID)
 
-			CID = self.shared.splitTag(cmsg, TAG_ID)
-	
-			if CID == ERROR:
-				self.log.LOG(LOG_ERROR, "sms.processMessage()", "Failed to retrieve client ID from received message.")
-				return ERROR
+		if CID == ERROR:
+			self.log.LOG(LOG_ERROR, "sms.processMessage()", "Failed to retrieve client ID from received message.")
+			return ERROR
 
-			if CID == WEB:
-				self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from WEB client was received.")
-				self.doWebAction(cmsg, client_channel)
-				return OK
+		if CID == WEB:
+			self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from WEB client was received.")
+			self.doWebAction(cmsg, client_channel)
+			return OK
 
-			elif CID == ASTERISK:
-				self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ASTERISK client was received.")
-				return OK
+		elif CID == ASTERISK:
+			self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ASTERISK client was received.")
+			return OK
 
-			elif CID == ALARMS:
-				self.doAlarmAction(cmsg, client_channel)
-				self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ALARMS client was received.")
-				return OK
+		elif CID == ALARMS:
+			self.doAlarmAction(cmsg, client_channel)
+			self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ALARMS client was received.")
+			return OK
 
-			elif CID == MANAGER:
-				self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from MANAGER was received.")	
-				self.doManagerAction(cmsg)
+		elif CID == MANAGER:
+			self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from MANAGER was received.")	
+			self.doManagerAction(cmsg)
 
-			else:
-				self.log.LOG(LOG_INFO, "sms.processMessage()", "Received message has an invalid ID: %d" % CID)
-				return INVALID
-##
-# Brief: Get de CMD from MANAGER message and process the action.
-# Param: cmsg The message to be processed.
-##
+		else:
+			self.log.LOG(LOG_INFO, "sms.processMessage()", "Received message has an invalid ID: %d" % CID)
+			return INVALID
+
 	def doManagerAction(self, cmsg):
-
+		"""
+		Brief: Get de CMD from MANAGER message and process the action.
+		Param: cmsg The message to be processed.
+		"""
 		CMD = self.shared.splitTag(cmsg, TAG_CMD)
 		
 		if CMD == ERROR:
@@ -190,11 +189,11 @@ class sms:
 
 		else:
 			self.log.LOG(LOG_ERROR, "sms.doManagerAction()", "Received message has an invalid command: %s" % CMD)
-##
-# Brief: Process the WEB client messages.
-##
-	def doWebAction(self, cmsg, client_channel):
 
+	def doWebAction(self, cmsg, client_channel):
+		"""
+		Brief: Process the WEB client messages.
+		"""
 		CMD = self.shared.splitTag(cmsg, TAG_CMD)
 
 		if CMD == CMD_LOGIN:
@@ -211,11 +210,11 @@ class sms:
 			self.log.LOG(LOG_ERROR, "sms", "Error while reading web request. Unknow command: %s" % CMD)			
 			self.__sendMessage(client_channel, "%s" % RETURN[NOTFOUND])
 			client_channel.close()
-##
-# Brief: Process the ALARMS requisitons.
-##
-	def doAlarmAction(self, cmsg, client_channel):
 
+	def doAlarmAction(self, cmsg, client_channel):
+		"""	
+		Brief: Process the ALARMS requisitons.
+		"""
 		CMD = self.shared.splitTag(cmsg, TAG_CMD)
 
 		if CMD == CMD_BLOW:
@@ -239,13 +238,14 @@ class sms:
 			self.__sendMessage(client_channel, "%s" % ERROR)
 			self.dbcom.changeAlarmStatus(counter, FAILED)
 			client_channel.close()
-##
-# Brief: Send message in the channel.
-# Param: channel The destination to the message.
-# Param: msg The message to be sent.
-# Return: OK if the message has be sent
-##
+
 	def __sendMessage(self, channel, msg):
+		"""
+		Brief: Send message in the channel.
+		Param: channel The destination to the message.
+		Param: msg The message to be sent.
+		Return: OK if the message has be sent
+		"""
 		try:
 			channel.send(msg)
 			return OK
@@ -262,7 +262,7 @@ if __name__ == "__main__":
 	bind_port = 3435
 	log_path = "log"
 
-	system = sms(bind_address, bind_port, log_path, GSM_ATCOM)
+	system = trigger(bind_address, bind_port, log_path, GSM_ATCOM)
 	system.start()
 #---------------------------------------------------------#
 

@@ -10,10 +10,6 @@ TIME_BETWEEN_AT = 0.2
 
 class Atcom:
 
-##
-# Brief: Set global parameters that will be 
-#		used by the most part of the functions.
-##
 	def __init__(self, wport="/dev/ttyACM0", bitrate="115200", logname="./gsmcom.log", atLogPath="", mtype="default"):
 
 		self.wport = wport
@@ -22,11 +18,11 @@ class Atcom:
 		self.log = slog(logname)
 		self.atlog = slog("%s/atcom.log" % atLogPath)
 		self.serial = ''
-##
-# Brief: Open a serial port to communicate with the module.
-##
-	def _open_port (self):
 
+	def _open_port (self):
+		"""
+		Brief: Open a serial port to communicate with the module.
+		"""
 		try:
 			self.serial = serial.Serial(self.wport, self.bitrate, timeout=1)
 			return OK
@@ -34,22 +30,24 @@ class Atcom:
 		except IOError, emsg:
 			self.log.LOG(LOG_CRITICAL, "gsmcom._open_port()", "An error occurred when opening %s port with %s of bitrate. Error: %s" % (self.wport, self.bitrate, emsg))
 			return ERROR
-##
-# Brief: Close the communication serial port.
-##
+
 	def _close_port(self):
+		"""
+		Brief: Close the communication serial port.
+		"""
 		try:
 			self.serial.close()
 			return OK
 		except IOError, emsg:
 			self.log.LOG(LOG_ERROR, "gsmcom", "Attempt to close the serial port failed. Error: %s" % emsg)
 			return ERROR
-##
-# Brief: Read content of serial buffer.
-# Return: The data of the serial buffer if exist; 
-#	ERROR if something went wrong.
-##
+
 	def _read(self):
+		"""
+		Brief: Read content of serial buffer.
+		Return: The data of the serial buffer if exist; 
+		      ERROR if something went wrong.
+		"""
 		try:
 			msg = ""
 			while(self.serial.inWaiting() > 0):
@@ -59,14 +57,14 @@ class Atcom:
 		except IOError, emsg:
 			self.log.LOG(LOG_ERROR, "gsmcom._read()", "An error occurred while reading the serial buffer. Error: %s" % emsg)
 			return ERROR
-##
-# Brief: Send content in serial buffer.
-# Param: msg The content to be sent.
-# Return: OK if the command was sent; ERROR if
-#	something went wrong.
-##
+
 	def _send(self, msg):
-		
+		"""
+		Brief: Send content in serial buffer.
+		Param: msg The content to be sent.
+		Return: OK if the command was sent; ERROR if
+		      something went wrong.
+		"""		
 		try:
 			self.serial.write(msg+'\r')
 			sleep(TIME_BETWEEN_AT)
@@ -81,31 +79,32 @@ class Atcom:
 		#r_msg = self.read()
 		#self.log("Answer:\n %s\n" % r_msg, "%s" % now())
 		return OK
-##
-# Brief: Print the chosen parameters to be used.
-##
+
 	def info (self):
+		"""
+		Brief: Print the chosen parameters to be used.
+		"""
 		print "Valores utilizados: %s %s %s %s" % (self.wport, self.bitrate, self.logname, self.mtype)
 		return
 	
 ###########################
 # Specific functions	  #
 ###########################
-##
-# Brief: Send initializing commands to the module
-##
 	def initModule(self):
+		"""
+		Brief: Send initializing commands to the module
+		"""
 		pass
-##
-# Brief: Send a sms.
-# Param: destination The destination extension to were
-#	the sms will be sent.
-# Param: content The message that the sms will load.
-# Return: OK if the alarm was sent; ERROR in whatever
-#	other case.
-##
-	def sendSMS(self, destination, content):
 
+	def sendSMS(self, destination, content):
+		"""
+		Brief: Send a sms.
+		Param: destination The destination extension to were
+		      the sms will be sent.
+		Param: content The message that the sms will load.
+		Return: OK if the alarm was sent; ERROR in whatever
+		      other case.
+		"""
 		if self._open_port() == ERROR:
 			return ERROR
 		
