@@ -1,23 +1,16 @@
 <script type="text/javascript">
-function submitform()
+function schedule_sms()
 {
-	document.write("testando!");
- //   document.forms["myform"].submit();
-hostname = "192.168.0.105"
-port = "3435"
-var conn = new TCPSocket(hostname, port)
- 
-conn.onopen = function() { alert('connection opened!') }
-conn.onread = function(data) { alert('RECEIVE: ' + data) }
-conn.onclose = function(data) { alert('connection closed!') }
- 
-conn.send('Hello World');
+	var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no');
+}
+function send_sms()
+{
+	var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no');
 }
 </script>
 
 
 <?php
-$con_timeout = 3;
 
 class block_control_by_sms extends block_base {
 
@@ -34,29 +27,30 @@ class block_control_by_sms extends block_base {
 
 		// Header //
                 $header = "<html><body>";
-		$schedule_sms.= '<html><body><br />';
+		$schedule_sms.= '<html><body>';
+		$schedule_sms.= '<table>';
 
 		// First Service //
-		$schedule_sms.= '<form name="schedule_sms" id="schedule_sms" action="send.php" method="post">';
+		$schedule_sms.= '<tr>';
 		$schedule_sms.= '<div style="text-align:center;"><b>';
+		$schedule_sms.= '<a href="javascript: schedule_sms()">';
 		$schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
-                $schedule_sms.= '</b></div>';
+                $schedule_sms.= '</a></b></div>';
+		$schedule_sms.= '</tr>';
 
-		$schedule_sms.= '<table>';
-		$schedule_sms.= '<tr><td>';
-		$schedule_sms.= '<input type="text" name="message" value="" />';
-		$schedule_sms.= '</td></tr>';
+		// Second Service //
+		$schedule_sms.= '<tr>';
+		$schedule_sms.= '<div style="text-align:center;"><b>';
+		$schedule_sms.= '<a href="javascript: send_sms()">';
+		$schedule_sms.= get_string('send_sms', 'block_control_by_sms');
+                $schedule_sms.= '</a></b></div>';
+		$schedule_sms.= '</tr>';
 
-		$schedule_sms.= '<tr><td>';
-		//$schedule_sms.= '<div style="text-align:center;"><input type="submit" name="Agendar!" value="Enviar" /><br /></div>';
-		$schedule_sms.= '<a href="javascript: submitform()">Submit</a>';
-		$schedule_sms.= '</td></tr>';
 
 		$schedule_sms.= '</table>';
-		$schedule_sms.= '</form>';
 
 		// Tail //
-                $schedule_sms.= "<br /></body></html>";
+                $schedule_sms.= "</body></html>";
 
 		$this->content->text   = $schedule_sms;
 		$this->content->footer = 'Developed by Rozsa';
@@ -65,7 +59,11 @@ class block_control_by_sms extends block_base {
 	}
 
 	public function specialization() {
-		$this->ping_daemon();
+		global $USER;
+		$user = $USER->id;
+		echo "dasda $user";
+	
+		//$this->ping_daemon();
 	}
 	
 /********************************/
@@ -74,8 +72,6 @@ class block_control_by_sms extends block_base {
 
 	private function ping_daemon() {
 
-		global $CFG;
-
 		if (empty($this->config->daemon_address)) {
 			//$this->config->daemon_address = "127.0.0.1";
 		}
@@ -83,16 +79,5 @@ class block_control_by_sms extends block_base {
 			$this->config->daemon_port = 3435;
 		}
 
-		//echo "$this->config->daemon_address";
-		$stream = fsockopen("192.168.0.105", 3435, $errno, $errstr, $con_timeout);
-		//stream_set_timeout($stream, $timeout);
-
-		if ($stream == Null) {
-			echo "Failed to connect to daemon.";
-		} else {
-			echo "Connected to daemon successful.";
-		}
-		fclose($stream);
-		
 	}
 } 

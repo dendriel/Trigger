@@ -13,3 +13,4 @@
 	$string['descallowhtml'] = "Sei la ";
 
  $string['schedule_sms'] = "Schedule SMS";
+ $string['send_sms'] = "Send SMS";
