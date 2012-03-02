@@ -32,6 +32,10 @@ PHP:
 
  Strings
  http://www.tiexpert.net/programacao/web/php/concatenacao-e-operacoes-matematicas.php
+
+ Interacting w/JavaScript:
+ http://www.the-art-of-web.com/php/javascript-escape/
+
 ----------------------------------------------+
 HTML:
 
@@ -60,3 +64,7 @@ ATtention references:
  Erros
  http://www.smssolutions.net/tutorials/gsm/gsmerrorcodes/ 
 
+----------------------------------------------+
+JavaScript:
+
+http://stackoverflow.com/questions/87359/can-i-pass-a-javascript-variable-to-another-browser-window

@@ -1,15 +1,3 @@
-<script type="text/javascript">
-function schedule_sms()
-{
-	var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no');
-}
-function send_sms()
-{
-	var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no');
-}
-</script>
-
-
 <?php
 
 class block_control_by_sms extends block_base {
@@ -59,25 +47,34 @@ class block_control_by_sms extends block_base {
 	}
 
 	public function specialization() {
-		global $USER;
-		$user = $USER->id;
-		echo "dasda $user";
-	
-		//$this->ping_daemon();
+		global $COURSE;
+		$course_id = $COURSE->id;
+
+		$js.= "<script type=\"text/javascript\">\n";
+		$js.= "function schedule_sms() {\n";
+		//$js.= "var course_id = $course_id;\n";
+		$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=' + $course_id + '&var1=2' + '&var2=3','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no'); \n}\n";
+		$js.= "function send_sms() {\n";
+		$js.= "var course_id = $course_id;\n";
+		$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=600,width=800,resizable=no,toolbar=no,location=no,status=no'); \n}\n";
+		$js.= "</script>\n";
+
+		echo $js;
+
 	}
 	
 /********************************/
 /*      Private Functions 	*/
 /********************************/
 
-	private function ping_daemon() {
+//	private function ping_daemon() {
 
-		if (empty($this->config->daemon_address)) {
+//		if (empty($this->config->daemon_address)) {
 			//$this->config->daemon_address = "127.0.0.1";
-		}
-		if (empty($this->config->daemon_port)) {
-			$this->config->daemon_port = 3435;
-		}
+//		}
+//		if (empty($this->config->daemon_port)) {
+//			$this->config->daemon_port = 3435;
+//		}
 
-	}
+//	}
 } 

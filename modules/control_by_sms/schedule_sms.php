@@ -1,31 +1,58 @@
 <html>
-<head></head>
+<head>
+<script type="text/javascript">
+function show_param()
+{
+	var x = 0
+	var parameters = {};
+	mySearch = location.search.substr(1).split("&")
+	
+	for (x=0;x<mySearch.length;x++) {
+
+		var params = mySearch[x].split("=");
+		parameters[params[0]] = params[1];
+	}
+	return parameters;
+}
+</script>
+</head>
 
 <body>
+
+
+
+
 <?php
-include_once realpath(dirname( __FILE__ ).DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR."common.php";
-include_once LIB_DIR.DIRECTORY_SEPARATOR."User.php";
-include_once LIB_DIR.DIRECTORY_SEPARATOR."Course.php";
-include_once LIB_DIR.DIRECTORY_SEPARATOR."eMail.php";
+	include('Postgrescom.class.php');
 
-	global $USER;
-	$userid = $USER->id;
-	echo "user: $userid";
+	$con = new Postgrescom();
 
-	$con = mysql_connect("localhost", "moodle", "moodle");
-	if (!$con) {
-		die('Could not connect: ' . mysql_error());
+	$con->open();
+
+	if($con->statusCon() == -1) {
+		echo "conexao falhou!";
+		exit;
 	}
-	mysql_select_db("moodle", $con);
-	$list_name = mysql_query("SELECT username FROM mdl_user");
-
-	while($name = mysql_fetch_array($list_name)) {
-		echo "$name <br />";
+	$users = $con->query("SELECT username, phone1 FROM mdl_user");
+	
+	if ($users == -1) {
+		echo "erro ao enviar query!";
+		exit;
 	}
-	mysql_close($con);
+        while($user = pg_fetch_row($users)) {
+            echo "$user[0] - $user[1] <br />";
+        }
+	$con->close();
+
+	$con->statusCon();
+
+//	$js.= "<script type=\"text/javascript\">\n";
+//	$js.= "var parameters = show_param()\n";
+//	$js.= "alert('course_id = ' + parameters['course_id'])\n";
+//	$js.= "</script>\n";
+//	echo $js;
+
 ?>
-
-
 
 </body>
 </html>
