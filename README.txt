@@ -25,6 +25,8 @@ PYTHON:
 ----------------------------------------------+
 PHP:
 
+http://www.php.net/
+
  Login system:
  http://www.baboo.com.br/conteudo/modelos/Criando-um-simples-sistema-de-login-em-PHP_a5191_z0.aspx
  http://www.codigosnaweb.com/forum/Login-e-senha-com-session_1_4015.html
@@ -67,4 +69,7 @@ ATtention references:
 ----------------------------------------------+
 JavaScript:
 
-http://stackoverflow.com/questions/87359/can-i-pass-a-javascript-variable-to-another-browser-window
+ Specific issues:
+ http://stackoverflow.com/questions/87359/can-i-pass-a-javascript-variable-to-another-browser-window
+ http://www.mredkj.com/tutorials/tutorial005.html
+ http://www.mredkj.com/tutorials/tutorial007.html?sel2Name=optAVal3&sel2Name=optAVal1&sel2Name=optAVal2
