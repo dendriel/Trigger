@@ -67,4 +67,10 @@ ATtention references:
 ----------------------------------------------+
 JavaScript:
 
-http://stackoverflow.com/questions/87359/can-i-pass-a-javascript-variable-to-another-browser-window
+  http://stackoverflow.com/questions/87359/can-i-pass-a-javascript-variable-to-another-browser-window
+
+  Date:
+  http://www.smartwebby.com/DHTML/date_validation.asp
+
+  Radio:
+  http://javascript.about.com/library/blradio.htm

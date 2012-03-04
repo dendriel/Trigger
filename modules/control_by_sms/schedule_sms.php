@@ -1,58 +1,72 @@
-<html>
-<head>
-<script type="text/javascript">
-function show_param()
-{
-	var x = 0
-	var parameters = {};
-	mySearch = location.search.substr(1).split("&")
-	
-	for (x=0;x<mySearch.length;x++) {
-
-		var params = mySearch[x].split("=");
-		parameters[params[0]] = params[1];
-	}
-	return parameters;
-}
-</script>
-</head>
-
-<body>
-
-
-
-
 <?php
-	include('Postgrescom.class.php');
+include('./php/interface.php');
+include('Postgrescom.class.php');
 
-	$con = new Postgrescom();
+$con = new Postgrescom();
 
-	$con->open();
+$con->open();
+if($con->statusCon() == -1) {
+    echo "conexao falhou!";
+    exit;
+}
 
-	if($con->statusCon() == -1) {
-		echo "conexao falhou!";
-		exit;
-	}
-	$users = $con->query("SELECT username, phone1 FROM mdl_user");
-	
-	if ($users == -1) {
-		echo "erro ao enviar query!";
-		exit;
-	}
-        while($user = pg_fetch_row($users)) {
-            echo "$user[0] - $user[1] <br />";
-        }
-	$con->close();
+$users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members)");
 
-	$con->statusCon();
+if ($users == -1) {
+    echo "erro ao enviar query!";
+    exit;
+}
 
-//	$js.= "<script type=\"text/javascript\">\n";
-//	$js.= "var parameters = show_param()\n";
-//	$js.= "alert('course_id = ' + parameters['course_id'])\n";
-//	$js.= "</script>\n";
-//	echo $js;
+$header = build_header();
+$contacts_table = build_contacts_table($users);
+$table_buttons = build_table_buttons();
+$selected_table = build_empty_table();
+$input_form = build_input_form();
+$tail = build_tail();
+
+
+$form.= $header;
+
+$form.= "<table>";
+$form.= "<tr>";
+
+$form.= "<td>";
+$form.= $contacts_table;
+$form.= "</td>";
+
+$form.= "<td>";
+$form.= $table_buttons;
+$form.= "</td>";
+
+$form.= "<form name=\"sms_service\" action=\"schedule_sms.php\" method=\"get\" onsubmit=\"return validateForm();\">";
+$form.= "<td>";
+$form.= $selected_table;
+$form.= "</td>";
+
+$form.= "<td>";
+$form.= $input_form;
+$form.= "</td>";
+
+$form.= "</tr>";
+$form.= "</form>";
+$form.= "</table>";
+
+$form.= $tail;
+
+echo $form;
+
+$con->close();
 
 ?>
 
-</body>
-</html>
+<?php
+
+if ($_GET != null) {
+  $contact_list = $_GET['destination_users_select'];
+	$index = 0;
+	for ($index = 0; $index<= count($contact_list); $index++) {
+		echo "<br />".$contact_list[$index];
+	}
+}
+?>
+
