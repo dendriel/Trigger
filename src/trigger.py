@@ -59,7 +59,7 @@ class trigger:
 		self.dbcom.getHigherCounter()
 
 		self.lookForConnection()
-		self.channel.close
+		self.channel.close()
 		sys.exit(0)
 
 	def checkConnection (self):

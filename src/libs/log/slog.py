@@ -63,3 +63,4 @@ class slog:
 	# maybe put in shared libs #
 	def makeDate():
 		pass
+

@@ -22,6 +22,11 @@ PYTHON:
 
  Python-dict(auto-complete):
  http://www.vim.org/scripts/script.php?script_id=850
+
+ Python-Postgres:
+ http://initd.org/psycopg/tarballs/
+ http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
+
 ----------------------------------------------+
 PHP:
 

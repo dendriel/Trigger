@@ -4,8 +4,8 @@
 
 echo "rm -f ./*.pyc"
 rm -f ./*.pyc
-echo "cd log; rm -f *.log; cd ../"
-cd log; rm -f *.log; cd ../
+echo "rm system.out"
+rm -f system.out
 echo "cd interfaces; rm -f *.pyc; cd ../"
 cd interfaces; rm -f *.pyc; cd ../
 echo "cd libs; rm -f *.pyc"
