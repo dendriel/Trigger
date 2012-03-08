@@ -25,6 +25,8 @@ PYTHON:
 
  Python-Postgres:
  http://initd.org/psycopg/tarballs/
+ http://initd.org/psycopg/docs/
+
  http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
 
 ----------------------------------------------+

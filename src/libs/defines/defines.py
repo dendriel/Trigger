@@ -49,10 +49,11 @@ DBCOM_LOGNAME = "dbcom.log"
 ALARM_LOGNAME = "alarm.log"
 
 # DATABASE DEFINITIONS #
-DB_HOST = "127.0.0.1"
-DB_USER = "root"
-DB_PASS = "root"
-DB_NAME = "senas"
+DB_HOST = "localhost"
+DB_PORT = 5433
+DB_USER = "trigger"
+DB_PASS = "trigger"
+DB_NAME = "trigger"
 
 TABLE_USER = "user"
 TABLE_SMS  = "sms"

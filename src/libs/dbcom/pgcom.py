@@ -1,11 +1,12 @@
 # -*-coding:utf-8-*-
 from defines import *
 import psycopg2
-import psycopg2.extensions
+from slog import slog
+#import psycopg2.extensions
 
 class Pgcom:
 
-    def __init__(self, db_host, db_user, db_pass, db_name, log_obj):
+    def __init__(self, db_host, db_user, db_pass, db_name, db_port, log_obj):
         """
         Brief: Initialize the database conection parameters.
         Param: db_host The ip where are the database.
@@ -23,47 +24,125 @@ class Pgcom:
         self.conn = ''
         self.cursor = ''
 
-    def start(self):
+    def checkConnection(self):
+
+        if self.__connect() == ERROR:
+            return ERROR
+
+        elif self.__disconnect() == ERROR:
+            return ERROR
+
+        else:
+            return OK
+
+    def checkTables(self, user_tables):
+
+        if self.__connect() == OK:
+
+            db_tables = self.__query("select relname from pg_stat_user_tables order by relname")
+
+            # if there is no tables #
+            if db_tables == ERROR:
+                db_tables = 'none'
+                return OK
+            else:
+                db_tables = db_tables[0]
+
+            for index in range(len(user_tables)):
+
+                present = False
+                for db_index in range(len(db_tables)):
+
+                    if user_tables[index] == db_tables[db_index]:
+                        present = True
+                        break
+
+                if present == False:
+
+                    ret = self.__createTable(user_tables[index])
+
+                    if ret == OK:
+                        self.log.LOG(LOG_INFO, "dbcom","Table \"%s\" created." % user_tables[index])
+
+                    elif ret == NOTFOUND:
+                        self.log.LOG(LOG_ERROR, "dbcom", "Failed when creating a new table in the database. The specified table [%s] aren't registered." % table_type)
+
+                    else:
+                        self.log.LOG(LOG_CRITICAL, "dbcom", "Failed when creating a new table in the database.")
+
+            self.__disconnect()
+            return OK
+
+
+        else:
+            return ERROR
+
+#--------------------------#
+#    Private functions     #
+#--------------------------#
+    def __connect(self):
 
         try:
             self.conn = psycopg2.connect("\
             dbname=%s\
             user=%s\
             host=%s\
-            port= %d\
+            port=%d\
             password=%s\
             " % (self.db_name, self.db_user, self.db_host, self.db_port, self.db_pass))
             self.cursor = self.conn.cursor()
-            self.__query("lol")
             return OK
 
         except Exception, exc:
-            #self.log.LOG(LOG_CRITICAL, "Pgcom.start()", "Erro ao se conectar a base de dados!");
-            print"%s: %s" % (exc.__class__.__name__, exc)
+            self.log.LOG(LOG_CRITICAL, "dbcom.__connect()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
+
+    def __disconnect(self):
+
+        try:
+            self.conn.commit()
+            self.cursor.close()
+            self.conn.close()
+            return OK
+
+        except Exception, exc:
+            self.log.LOG(LOG_CRITICAL, "dbcom.__disconnect()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
     def __query(self, query):
 
         try:
-            self.cursor.execute("select *  from teste")
-            print self.cursor.fetchall()
-            return OK
+            self.cursor.execute(query)
+            return self.cursor.fetchall()
+
         except Exception, exc:
-            #self.log.LOG(LOG_CRITICAL, "Pgcom.start()", "Erro ao se conectar a base de dados!");
-            print"%s: %s" % (exc.__class__.__name__, exc)
+            self.log.LOG(LOG_CRITICAL, "dbcom.__query()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
 
-    #método destrutor
-    def __del__(self):
-        print "Conexão finalizada!";
-        del self;
+    def __createTable(self, table_type):
+
+        try:
+
+            if table_type == TABLE_SMS:
+                query = "CREATE TABLE %s (orig CHAR(8), dest CHAR(12), msg CHAR(150), oper INT, blow CHAR(12), stat INT, count SERIAL PRIMARY KEY);" % (TABLE_SMS)
+                self.cursor.execute(query)
+                return OK
+    
+            else:
+                return NOTFOUND
+
+        except Exception, exc:
+            self.log.LOG(LOG_CRITICAL, "dbcom.__createTable()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
 
 #---------------------------------------------------------#
-# 			System start 			  #
+#         System start    #
 #---------------------------------------------------------#
 if __name__ == "__main__":
 
-    dbcom = Pgcom("localhost", "trigger", "trigger", "trigger", SYSTEM_LOG_PATH)
-    dbcom.start()
+    log = slog("./system.out")
+    dbcom = Pgcom("localhost", "trigger", "trigger", "trigger", 5433, log)
+    dbcom.checkConnection()
+    dbcom.checkTables((TABLE_SMS,))
 #---------------------------------------------------------#
