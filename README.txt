@@ -13,6 +13,7 @@ GIT:
  http://book.git-scm.com/3_basic_branching_and_merging.html
  http://mergulhao.info/cheat-sheets
  http://blog.tinogomes.com/2011/04/01/git-renomear-o-branch-master/
+
 ----------------------------------------------+
 PYTHON:
  
@@ -27,6 +28,10 @@ PYTHON:
  http://initd.org/psycopg/tarballs/
  http://initd.org/psycopg/docs/
 
+----------------------------------------------+
+POSTGRES:
+
+ http://www.postgresql.org/docs/8.2/static/auth-pg-hba-conf.html
  http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
 
 ----------------------------------------------+
