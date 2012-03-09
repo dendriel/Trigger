@@ -18,7 +18,7 @@ class Pgcom:
         self.db_user = db_user
         self.db_pass = db_pass
         self.db_name = db_name
-        self.db_port = 5433
+        self.db_port = db_port
         self.log = log_obj
         self.conn = ''
         self.cursor = ''
