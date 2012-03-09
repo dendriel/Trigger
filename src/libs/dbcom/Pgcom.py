@@ -1,7 +1,6 @@
 # -*-coding:utf-8-*-
-from defines import *
 import psycopg2
-from slog import slog
+from libs.defines.defines import *
 #import psycopg2.extensions
 
 class Pgcom:
@@ -37,6 +36,9 @@ class Pgcom:
 
     def checkTables(self, user_tables):
 
+        if len(user_tables) == 0:
+            return OK
+
         if self.__connect() == OK:
 
             db_tables = self.__query("select relname from pg_stat_user_tables order by relname")
@@ -62,7 +64,7 @@ class Pgcom:
                     ret = self.__createTable(user_tables[index])
 
                     if ret == OK:
-                        self.log.LOG(LOG_INFO, "dbcom","Table \"%s\" created." % user_tables[index])
+                        self.log.LOG(LOG_INFO, "dbcom","Table \"%s\"  was created." % user_tables[index])
 
                     elif ret == NOTFOUND:
                         self.log.LOG(LOG_ERROR, "dbcom", "Failed when creating a new table in the database. The specified table [%s] aren't registered." % table_type)

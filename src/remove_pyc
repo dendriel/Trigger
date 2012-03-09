@@ -6,8 +6,6 @@ echo "rm -f ./*.pyc"
 rm -f ./*.pyc
 echo "rm system.out"
 rm -f system.out
-echo "cd interfaces; rm -f *.pyc; cd ../"
-cd interfaces; rm -f *.pyc; cd ../
 echo "cd libs; rm -f *.pyc"
 cd libs; rm -f *.pyc
 echo "cd log; rm -f *.pyc;"
@@ -22,3 +20,6 @@ echo "cd ../dbcom; rm -f *.pyc"
 cd ../gsmcom; rm -f *.pyc
 echo "cd ../gsmcom; rm -f *.pyc"
 cd ../dbcom; rm -f *.pyc
+echo "cd ../manager; rm -f *.pyc"
+cd ../manager; rm -f *.pyc
+

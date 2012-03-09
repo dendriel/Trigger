@@ -8,10 +8,9 @@ from libs.log.slog import slog
 from libs.defines.defines import *
 from libs.alarm.alarm import alarm
 from libs.shared.shared import shared
-from libs.dbcom.dbcom import dbcom
+from libs.dbcom.Pgcom import Pgcom
 from libs.gsmcom.Atcom import Atcom
 from libs.manager.Manager import Manager
-from interfaces.Web import Web
 
 class trigger:
 
@@ -24,25 +23,25 @@ class trigger:
         """
         self.address = address
         self.port = port
-        self.channel = '' 
-        
+        self.channel = ''
+
         try:
             self.log = slog(SYSTEM_LOG_PATH)
-            self.dbcom = dbcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, SYSTEM_LOG_PATH)
-            self.manager = manager(self.log)
-            
+            self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
+            self.manager = Manager(self.log)
+
             if gsmcom_type == GSM_ATCOM:
                 self.gsmcom = Atcom(SYSTEM_LOG_PATH, SYSTEM_LOG_PATH)
-            
+
             elif gsmcom_type == GSM_ASTERISK:
                 raise Exception
-            
+
             else:
                 raise Exception
-        
-        except:
-        	print "Failed to create one of the objects."
-        	sys.exit(0)
+
+        except Exception, exc:
+            print "Failed to create one of the objects. %s: %s" % (exc.__class__.__name__, exc)
+            sys.exit(0)
 
     def start(self):
         """
@@ -52,12 +51,12 @@ class trigger:
         self.checkConnection()
 
         # Launch thread that will monitor SMS events #
-        self.manager.manageSmsEvents()
+        self.manager.launchMonitor()
         self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
 
         # Test dbcom #
-        #self.checkDatabase()
-        
+        self.checkDatabase()
+
         self.log.LOG(LOG_INFO, "sms", "System started.")
         self.lookForConnection()
         self.channel.close()
@@ -74,8 +73,8 @@ class trigger:
             self.channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.channel.bind((self.address, self.port))
             self.channel.listen(MAX_CONNECTIONS)
-            self.log.LOG(LOG_INFO, "sms", "System listening channel is OK.") 
-       
+            self.log.LOG(LOG_INFO, "sms", "System \"Listening Channel\" is OK.")
+
         except socket.error, msg:
             self.channel.close()
             self.log.LOG(LOG_CRITICAL, "sms.checkConnection()", "Failed to set the server listening connection. Error: %s. Aborting the system startup." % msg)
@@ -84,18 +83,18 @@ class trigger:
     def checkDatabase(self):
 
         if self.dbcom.checkConnection() == ERROR:
-       	    self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "sms.checkConnection()", "Failed to set the database connection. Aborting the system startup.")
-            exit(-1)
-        
-        else:
-            self.log.LOG(LOG_INFO, "sms", "Database access is OK.") 
-        
-        if self.dbcom.checkTables() == ERROR:
             self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "sms.checkConnection()", "Failed to check the default tables of the database. Aborting the system startup.")
+            self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to set the database connection. Aborting the system startup.")
             exit(-1)
-        
+
+        else:
+            self.log.LOG(LOG_INFO, "sms", "Access to the Database is OK.") 
+
+        if self.dbcom.checkTables(DB_TABLES) == ERROR:
+            self.channel.close()
+            self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to check the default tables of the database. Aborting the system startup.")
+            exit(-1)
+
         else:
             self.log.LOG(LOG_INFO, "sms", "Tables of the database are OK.") 
             return

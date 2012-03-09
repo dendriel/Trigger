@@ -13,8 +13,29 @@ class Manager:
 
         self.log = log_obj
         self.shared = shared()
+        self.monitor_thread = ''
 
-    def manageSmsEvents():
+    def launchMonitor(self):
+
+        try:
+            self.monitor_thread = Thread(target=self.smsEvents())
+            self.monitor_thread.start()
+
+        except Exception, exc:
+            self.log.LOG(LOG_CRITICAL, "manager.launchMonitor()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
+
+    def smsEvents(self):
+
+        while(True):
+            self.log.LOG(LOG_CRITICAL, "manager.smsEvents()", "THREAD RODANDO!!!")
+
+            # do sendService()
+            # do receiveService()
+            # sleep()
+
+
+
 
 
 

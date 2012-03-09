@@ -55,8 +55,8 @@ DB_USER = "trigger"
 DB_PASS = "trigger"
 DB_NAME = "trigger"
 
-TABLE_USER = "user"
 TABLE_SMS  = "sms"
+DB_TABLES = (TABLE_SMS,)
 
 # LIST OF COMMANDS #
 CMD_HALT 	= "halt"
