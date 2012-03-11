@@ -1,25 +1,29 @@
 # -*-coding:utf-8-*-
 import socket
+import time
 from threading import Thread
-from mx.DateTime import now
+from datetime import datetime
 from libs.log.slog import slog
 from libs.defines.defines import *
-from libs.alarm.alarm import alarm
 from libs.shared.shared import shared
+from libs.dbcom.Pgcom import Pgcom
+
 
 class Manager:
 
-    def __init__(self, log_obj):
+    def __init__(self, log_obj, ):
 
         self.log = log_obj
         self.shared = shared()
         self.monitor_thread = ''
+        self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
 
     def launchMonitor(self):
 
         try:
-            self.monitor_thread = Thread(target=self.smsEvents())
+            self.monitor_thread = Thread(target=self.smsEvents)
             self.monitor_thread.start()
+            return OK
 
         except Exception, exc:
             self.log.LOG(LOG_CRITICAL, "manager.launchMonitor()", "%s: %s" % (exc.__class__.__name__, exc))
@@ -28,57 +32,51 @@ class Manager:
     def smsEvents(self):
 
         while(True):
-            self.log.LOG(LOG_CRITICAL, "manager.smsEvents()", "THREAD RODANDO!!!")
 
-            # do sendService()
+            self.sendService()
             # do receiveService()
-            # sleep()
+            time.sleep(MNGR_THRD_SLEEP)
 
+    def sendService(self):
 
+        try:
+            # recover active requisitions #
+            active_list = self.dbcom.getRequisitions(ACTIVE)
 
+            if active_list == NULL_LIST:
+                return OK
 
+            else:
+                active_list == active_list[0]
 
+            now = datetime.now()
+            now = now.replace(second=0, microsecond=0)
 
-##
-# Brief: Schedule an alarm.
-##
-    def actionScheduleAlarm(self, cmsg, dbcom):
+            # look for requisitions to send #
+            for req in active_list:
+                sub = req[1] - now
+                # change from timedelta to int #
+                sub = sub.total_seconds()
 
-        sms_dict = self.alarm.retrieveData(cmsg)
+                if sub < MAX_TIME_TO_SEND:
 
-        activity = ACTIVE
+                    if self.dbcom.changeRequisitionStatus(req[0], FAILED) == ERROR:
+                        self.log.LOG(LOG_CRITICAL, "manager.sendService()", "Failed to change requisition status. Requisiton id=\"%d\"" % req[0])
+                    else:
+                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton status changed to FAILED. Requisiton id=\"%d\"" % req[0])
 
-        if sms_dict == NOTFOUND:
-            self.log.LOG(LOG_ERROR, "manager", "TAGs are missing in the requisition to schedule an alarm. Aborting schedule.")
-            return NOTFOUND
+                elif sub <= MIN_TIME_TO_SEND:
+                    self.log.LOG(content="changing status for %d" % req[0])
+                    self.completeRequisition(req[0])
+                    self.dbcom.changeRequisitionStatus(req[0], SENT)
 
-        blow = self.shared.mountTime(sms_dict[DATA_BLOW])
-
-        if blow == INVALID:
-            return INVALID
-
-        elif blow < now() or blow == now():
-            activity = FAILED
-
-        for i in range(0, sms_dict[DATA_DESTN]):
-
-            ret = dbcom.registerAlarm(sms_dict[DATA_ORG], sms_dict[DATA_EXT+"%d" % i], sms_dict[DATA_BLOW], sms_dict[DATA_OPER+"%d" % i], sms_dict[DATA_MSG], activity)
-
-            if ret == OK and activity == ACTIVE:
-                alarm_counter = dbcom.getHigherCounter()
-                alarm_thread = Thread(target=self.alarm.launch, args=(sms_dict[DATA_ORG], sms_dict[DATA_EXT+"%d" % i], sms_dict[DATA_MSG], blow, alarm_counter,))
-                alarm_thread.start()
-                self.log.LOG(LOG_INFO, "sms", "New alarm thread has been started. Counter: %ld" % alarm_counter)
-
-        if ret == OK and activity == ACTIVE:
             return OK
 
-        if ret == NOTFOUND:
-            return NOTFOUND
-
-        elif activity == FAILED:
-            return INVALID
-
-        else:
+        except Exception, exc:
+            self.log.LOG(LOG_CRITICAL, "manager.sendService()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+    def completeRequisition(self, req_id):
+
+        data_dict = self.dbcom.getDataFromRequisition(req_id)
+        print data_dict

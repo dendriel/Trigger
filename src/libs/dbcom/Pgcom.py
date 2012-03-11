@@ -1,7 +1,7 @@
 # -*-coding:utf-8-*-
 import psycopg2
 from libs.defines.defines import *
-#import psycopg2.extensions
+import psycopg2.extensions
 
 class Pgcom:
 
@@ -40,13 +40,11 @@ class Pgcom:
             return OK
 
         if self.__connect() == OK:
-
             db_tables = self.__query("select relname from pg_stat_user_tables order by relname")
 
             # if there is no tables #
-            if db_tables == ERROR:
-                db_tables = 'none'
-                return OK
+            if db_tables == NULL_LIST:
+                db_tables = ()
             else:
                 db_tables = db_tables[0]
 
@@ -75,9 +73,51 @@ class Pgcom:
             self.__disconnect()
             return OK
 
+        else:
+            return ERROR
+
+    def getRequisitions(self, status):
+
+        if self.__connect() == OK:
+            query = "SELECT %s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, TABLE_SMS, status)
+            ret = self.__query(query)
+            self.__disconnect()
+            return ret
 
         else:
             return ERROR
+
+    def changeRequisitionStatus(self, req_id, status):
+
+        if self.__connect() == OK:
+            query = "UPDATE %s SET %s=%d WHERE %s=%d" % (TABLE_SMS, DATA_STATUS, status, DATA_ID, req_id)
+            ret = self.__query(query)
+            self.__disconnect()
+            return OK
+
+        else:
+            return ERROR
+
+    def getDataFromRequisition(self, req_id):
+        """
+        brief: Retrive data from database to complete the requisition.
+        Param: req_id The id to select the requisition.
+        Return: A dictionay with the necessary data.
+        """
+        if self.__connect() == OK:
+            query = "SELECT %s FROM %s WHERE %s=%d" % ((DATA_ORIG+","+DATA_DESTN+","+DATA_MSG), TABLE_SMS, DATA_ID, req_id)
+            self.log.LOG(content="%s" % query)
+            data = self.__query(query)
+            self.__disconnect()
+            # mount a dictionary with the data #
+            data = data[0]
+            req_dict = {DATA_ORIG:data[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
+            req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1] = req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1][0:8]
+            return req_dict
+
+        else:
+            return ERROR
+
 
 #--------------------------#
 #    Private functions     #
@@ -117,9 +157,12 @@ class Pgcom:
             self.cursor.execute(query)
             return self.cursor.fetchall()
 
+        except psycopg2.ProgrammingError:
+            return NULL_LIST
+
         except Exception, exc:
-            self.log.LOG(LOG_CRITICAL, "dbcom.__query()", "%s: %s" % (exc.__class__.__name__, exc))
-            return ERROR
+                self.log.LOG(LOG_CRITICAL, "dbcom.__query()", "%s: %s" % (exc.__class__.__name__, exc))
+                return ERROR
 
 
     def __createTable(self, table_type):
@@ -127,7 +170,7 @@ class Pgcom:
         try:
 
             if table_type == TABLE_SMS:
-                query = "CREATE TABLE %s (orig CHAR(8), dest CHAR(12), msg CHAR(150), oper INT, blow CHAR(12), stat INT, count SERIAL PRIMARY KEY);" % (TABLE_SMS)
+                query = "CREATE TABLE %s (orig CHAR(8), dest CHAR(400), msg CHAR(150), oper INT, blow TIMESTAMP, stat INT, id SERIAL PRIMARY KEY);" % (TABLE_SMS)
                 self.cursor.execute(query)
                 return OK
     

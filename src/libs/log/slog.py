@@ -1,7 +1,7 @@
 #################################################################
 #  This is a funny module, because if he stop for any reason,   #
 # we will lost our way to know what is happening in the system. #
-# Then, do not mess this up!					#
+# Then, do not mess this up!                                    #
 #################################################################
 
 from libs.defines.defines import *
@@ -12,7 +12,7 @@ class slog:
 ##
 # Brief: start the object and define the log file path
 # Param: directory The log file path, the log name is defined in libs.include.include
-##	
+##
 	def __init__(self, directory):
 		self.directory = directory
 		self.shared = shared()
@@ -24,7 +24,7 @@ class slog:
 # Param: content The message to logging.
 # Return: OK if the message was logged; ERROR if there are any error.
 ##
-	def LOG(self, level, callerName, content):
+	def LOG(self, level=LOG_INFO, callerName="main", content=EMPTY):
 		try:
 			# makeDate #
 			path = "%s" % (self.directory)

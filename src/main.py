@@ -6,7 +6,6 @@ from time import *
 from threading import Thread
 from libs.log.slog import slog
 from libs.defines.defines import *
-from libs.alarm.alarm import alarm
 from libs.shared.shared import shared
 from libs.dbcom.Pgcom import Pgcom
 from libs.gsmcom.Atcom import Atcom
@@ -33,9 +32,6 @@ class trigger:
             if gsmcom_type == GSM_ATCOM:
                 self.gsmcom = Atcom(SYSTEM_LOG_PATH, SYSTEM_LOG_PATH)
 
-            elif gsmcom_type == GSM_ASTERISK:
-                raise Exception
-
             else:
                 raise Exception
 
@@ -49,13 +45,14 @@ class trigger:
         """
         self.log.LOG(LOG_INFO, "sms", "Starting the system.")
         self.checkConnection()
-
-        # Launch thread that will monitor SMS events #
-        self.manager.launchMonitor()
-        self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
-
         # Test dbcom #
         self.checkDatabase()
+        # Launch thread that will monitor SMS events #
+        self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
+        if self.manager.launchMonitor() != OK:
+            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to launch monitor thread. Halting...")
+            self.channel.close()
+            sys.exit(0)
 
         self.log.LOG(LOG_INFO, "sms", "System started.")
         self.lookForConnection()
