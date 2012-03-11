@@ -3,7 +3,7 @@ import psycopg2
 #from defines import *
 #from slog import slog
 from libs.defines.defines import *
-#import psycopg2.extensions
+import psycopg2.extensions
 
 class Pgcom:
 
@@ -51,7 +51,7 @@ class Pgcom:
             db_tables = self.__query("select relname from pg_stat_user_tables order by relname")
 
             # if there is no tables #
-            if db_tables == []:
+            if db_tables == NULL_LIST:
                 db_tables = ()
             else:
                 db_tables = db_tables[0]
@@ -91,13 +91,13 @@ class Pgcom:
         Brief: Insert a new row for the new requisiton.
         Param: data The data for the new row.
         Return: OK if the new entry was successful inserted. ERROR if something went wrong.
-		"""
+        """
         if self.__connect() == OK:
-    	    query = "INSERT INTO %s\
-    	    	     (orig, dest, msg, oper, blow, stat) VALUES\
-    	    	     ('%s', '%s', '%s', %d, '%s', %d)"\
-    	    	     % (TABLE_SMS, data[DATA_ORG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_BLOW], ACTIVE)
-    	    self.__query(query)
+            query = "INSERT INTO %s\
+             (orig, dest, msg, oper, blow, stat) VALUES\
+             ('%s', '%s', '%s', %d, '%s', %d)"\
+             % (TABLE_SMS, data[DATA_ORG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_BLOW], ACTIVE)
+            self.__query(query)
 
             if self.__disconnect() == ERROR:
                 self.log.LOG(LOG_CRITICAL, "dbcom", "Failed to disconnect from the DBMS.")
@@ -110,10 +110,47 @@ class Pgcom:
         else:
             return ERROR
 
-    def retrieveRegister(self):
+    def getRequisitions(self, status):
+
+        if self.__connect() == OK:
+            query = "SELECT %s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, TABLE_SMS, status)
+            ret = self.__query(query)
+            self.__disconnect()
+            return ret
+
+        else:
+            return ERROR
+
+    def changeRequisitionStatus(self, req_id, status):
+
+        if self.__connect() == OK:
+            query = "UPDATE %s SET %s=%d WHERE %s=%d" % (TABLE_SMS, DATA_STATUS, status, DATA_ID, req_id)
+            ret = self.__query(query)
+            self.__disconnect()
+            return OK
+
+        else:
+            return ERROR
+
+    def getDataFromRequisition(self, req_id):
         """
-        
+        brief: Retrive data from database to complete the requisition.
+        Param: req_id The id to select the requisition.
+        Return: A dictionay with the necessary data.
         """
+        if self.__connect() == OK:
+            query = "SELECT %s FROM %s WHERE %s=%d" % ((DATA_ORIG+","+DATA_DESTN+","+DATA_MSG), TABLE_SMS, DATA_ID, req_id)
+            self.log.LOG(content="%s" % query)
+            data = self.__query(query)
+            self.__disconnect()
+            # mount a dictionary with the data #
+            data = data[0]
+            req_dict = {DATA_ORIG:data[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
+            req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1] = req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1][0:8]
+            return req_dict
+
+        else:
+            return ERROR
 
 #--------------------------#
 #    Private functions     #
@@ -164,32 +201,36 @@ class Pgcom:
             self.cursor.execute(query)
             return self.cursor.fetchall()
 
+        except psycopg2.ProgrammingError:
+            return NULL_LIST
+
         except Exception, exc:
             self.log.LOG(LOG_CRITICAL, "dbcom.__query()", "%s: %s" % (exc.__class__.__name__, exc))
             return INVALID
 
     def __createTable(self, table_type):
-	"""
-	Brief: Create the specified table structure in database.
-	Param: table_type The pre-defined type of the table that will be created. A list of the allowed tables are registered in the defines file.
-	Return: OK if the table can be created; NOTFOUND if the specified table does not exist; ERROR if something went wrong.
-	Note: This function will be used only at the system startup, when the system start checking if everything is OK and if they are in their places.
-	"""
+        """
+        Brief: Create the specified table structure in database.
+        Param: table_type The pre-defined type of the table that will be created. A list of the allowed tables are registered in the defines file.
+        Return: OK if the table can be created; NOTFOUND if the specified table does not exist; ERROR if something went wrong.
+        Note: This function will be used only at the system startup, when the system start checking if everything is OK and if they are in their places.
+        """
         try:
 
             if table_type == TABLE_SMS:
                 query = "CREATE TABLE %s (\
-			   orig CHAR(10),\
-			   dest CHAR(449),\
-			    msg CHAR(150),\
-			   oper INT,\
-			   blow CHAR(12),\
-			   stat INT,\
-			  count SERIAL PRIMARY KEY\
-			  );" % (TABLE_SMS)
+                 orig CHAR(10),\
+                 dest CHAR(449),\
+                  msg CHAR(150),\
+                 oper INT,\
+                 blow CHAR(12),\
+                 stat INT,\
+                count SERIAL PRIMARY KEY\
+                );" % (TABLE_SMS)
+
                 self.cursor.execute(query)
                 return OK
-    
+
             else:
                 return NOTFOUND
 
@@ -205,11 +246,11 @@ if __name__ == "__main__":
     log = slog("./system.out")
     dbcom = Pgcom("localhost", "trigger", "trigger", "trigger", 5432, log)
     if dbcom.checkConnection() == OK:
-	    dbcom.checkTables((TABLE_SMS,))
-	    data = {DATA_ORG: "vitor",\
-		    DATA_MSG: "Mensagem de teste =)",\
-		    DATA_BLOW: "121220122050",\
-		    DATA_OPER: 1,\
-		    DATA_DESTN: "91663900,96075098,96500721,91683900,96770127"}
-	    dbcom.registerRequisition(data)
+        dbcom.checkTables((TABLE_SMS,))
+        data = {DATA_ORG: "vitor",\
+            DATA_MSG: "Mensagem de teste =)",\
+            DATA_BLOW: "121220122050",\
+            DATA_OPER: 1,\
+            DATA_DESTN: "91663900,96075098,96500721,91683900,96770127"}
+        dbcom.registerRequisition(data)
 #---------------------------------------------------------#

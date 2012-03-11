@@ -14,8 +14,6 @@ echo "cd ../defines; rm -f *.pyc"
 cd ../defines; rm -f *.pyc
 echo "cd ../shared; rm -f *.pyc"
 cd ../shared; rm -f *.pyc
-echo "cd ../alarm; rm -f *.pyc"
-cd ../alarm; rm -f *.pyc
 echo "cd ../dbcom; rm -f *.pyc"
 cd ../gsmcom; rm -f *.pyc
 echo "cd ../gsmcom; rm -f *.pyc"

@@ -1,18 +1,11 @@
 # RETURN VALUES #
-OK =  		0
-ERROR    = 	-1
-INVALID  = 	-2
-NOTFOUND = 	-4
+OK       =  0
+ERROR    = -1
+INVALID  = -2
+NOTFOUND = -4
 
 # RETURN VALUES STRINGS #
 RETURN = {OK:"OK", ERROR:"ERROR", INVALID:"INVALID", NOTFOUND:"NOTFOUND"}
-
-# LIST OF IDs #
-WEB = 		100
-ASTERISK = 	101
-ALARMS = 	102
-MANAGER = 	105
-SYSTEM = 	200
 
 # TAGS #
 TAG_ID = 	"ID"
@@ -26,12 +19,14 @@ TAG_BLOW = 	"BLOW"
 TAG_PART = 	"PART"
 
 # DATA #
-DATA_ORG 	= "org"
+DATA_ORIG 	= "orig"
 DATA_MSG 	= "msg"
 DATA_BLOW 	= "blow"
 DATA_OPER 	= "oper"
-DATA_DESTN 	= "dest_number"
+DATA_DESTN 	= "dest"
 DATA_EXT 	= "extension"
+DATA_ID = "id"
+DATA_STATUS = "stat"
 
 # LOG LEVELS #
 LOG_INFO     = 10
@@ -66,10 +61,10 @@ CMD_LOGIN 	= "login"
 CMD_BLOW 	= "blow"
 
 # LIST OF ALARMS STATE #
-ACTIVE = 	0
-CANCELED = 	1
-FAILED = 	2
-SENT = 		3
+ACTIVE   = 0
+CANCELED = 1
+FAILED   = 2
+SENT     = 3
 
 # GSM COMMUNICATION #
 GSM_ATCOM 	= 20
@@ -78,3 +73,11 @@ GSM_ASTERISK 	= 21
 # SYSTEM DEFINITIONS #
 SYSTEM_PORT = 3435
 SYSTEM_LOG_PATH = "./system.out"
+
+# ETC #
+MNGR_THRD_SLEEP = 10 # seconds
+EMPTY = ""
+NULL_LIST = []
+MIN_TIME_TO_SEND = 10 # The minimum "at least" time to send #
+MAX_TIME_TO_SEND = -60 # The maximum time before the blow to send #
+SEPARATOR_CHAR = ','

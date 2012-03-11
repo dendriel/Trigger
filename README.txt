@@ -27,6 +27,7 @@ PYTHON:
  Python-Postgres:
  http://initd.org/psycopg/tarballs/
  http://initd.org/psycopg/docs/
+ http://packages.python.org/psycopg2/module.html
 
 ----------------------------------------------+
 POSTGRES:
