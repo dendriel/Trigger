@@ -18,15 +18,21 @@ TAG_HOWMANY = 	"HOWMANY"
 TAG_BLOW = 	"BLOW"
 TAG_PART = 	"PART"
 
-# DATA #
-DATA_ORIG 	= "orig"
-DATA_MSG 	= "msg"
-DATA_BLOW 	= "blow"
-DATA_OPER 	= "oper"
-DATA_DESTN 	= "dest"
-DATA_EXT 	= "extension"
-DATA_ID = "id"
-DATA_STATUS = "stat"
+# REQUISITION DATA #
+DATA_ORIG   = "orig"    # A name to identify the origin.                                 #
+DATA_DESTN  = "dest"    # The destination numbers.                                       #
+DATA_MSG    = "msg"     # The message to be sent.                                        #
+DATA_OPER   = "oper"    # An operator indicator. *not in use in this implementation*     #
+DATA_SEND   = "send"    # A flag that informs if the requisition is to be executed now.  #
+DATA_BLOW   = "blow"    # The date/time when the requisition will be sent.               #
+DATA_STATUS = "stat"    # The state of the requisition. *See requisition states*         #
+DATA_ID     = "id"      # The unique identifier of the requisition.                      #
+
+# REQUISITION STATES #
+ACTIVE   = 0
+CANCELED = 1
+FAILED   = 2
+SENT     = 3
 
 # LOG LEVELS #
 LOG_INFO     = 10
@@ -60,11 +66,6 @@ CMD_SEND_SMS 	= "send_sms"
 CMD_LOGIN 	= "login"
 CMD_BLOW 	= "blow"
 
-# LIST OF ALARMS STATE #
-ACTIVE   = 0
-CANCELED = 1
-FAILED   = 2
-SENT     = 3
 
 # GSM COMMUNICATION #
 GSM_ATCOM 	= 20

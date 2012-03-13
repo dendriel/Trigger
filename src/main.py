@@ -27,13 +27,13 @@ class trigger:
         try:
             self.log = slog(SYSTEM_LOG_PATH)
             self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
-            self.manager = Manager(self.log)
 
             if gsmcom_type == GSM_ATCOM:
-                self.gsmcom = Atcom(SYSTEM_LOG_PATH, SYSTEM_LOG_PATH)
-
+                self.gsmcom = Atcom(log_obj=self.log)
             else:
                 raise Exception
+
+            self.manager = Manager(self.log, self.gsmcom)
 
         except Exception, exc:
             print "Failed to create one of the objects. %s: %s" % (exc.__class__.__name__, exc)
@@ -44,20 +44,25 @@ class trigger:
         Brief: Call all necessary functions and goes into the connection loop
         """
         self.log.LOG(LOG_INFO, "sms", "Starting the system.")
+
+        # Test tcp/socket connection #
         self.checkConnection()
+
         # Test dbcom #
         self.checkDatabase()
+
+        # Test gsmcom #
+        self.testGsmCommunication()
+
         # Launch thread that will monitor SMS events #
-        self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
-        if self.manager.launchMonitor() != OK:
-            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to launch monitor thread. Halting...")
-            self.channel.close()
-            sys.exit(0)
+        self.launchMonitorThread()
 
         self.log.LOG(LOG_INFO, "sms", "System started.")
-        self.lookForConnection()
-        self.channel.close()
 
+        # Start to listening tcp socket #
+        self.lookForConnection()
+
+        self.channel.close()
         sys.exit(0)
 
     def checkConnection(self):
@@ -84,16 +89,35 @@ class trigger:
             self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to set the database connection. Aborting the system startup.")
             exit(-1)
 
-        else:
-            self.log.LOG(LOG_INFO, "sms", "Access to the Database is OK.") 
-
-        if self.dbcom.checkTables(DB_TABLES) == ERROR:
+        elif self.dbcom.checkTables(DB_TABLES) == ERROR:
             self.channel.close()
             self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to check the default tables of the database. Aborting the system startup.")
             exit(-1)
 
         else:
             self.log.LOG(LOG_INFO, "sms", "Tables of the database are OK.") 
+            return
+
+    def launchMonitorThread(self):
+
+        if self.manager.launchMonitor() != OK:
+            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to launch monitor thread. Halting...")
+            self.channel.close()
+            sys.exit(0)
+
+        else:
+            self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
+            return
+
+    def testGsmCommunication(self):
+
+        if self.gsmcom.testCommunication() != OK:
+            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to communicate with GSM module. Halting...")
+            self.channel.close()
+            sys.exit(0)
+
+        else:
+            self.log.LOG(LOG_INFO, "sms", "GSM module is OK.")
             return
 
     def lookForConnection(self):

@@ -27,10 +27,10 @@ class Pgcom:
         self.cursor = ''
 
     def checkConnection(self):
-	"""
-	Brief: Test the connection and parameters for database access.
-	Return: OK if could establish a connection and access the database; ERROR otherwise.
-	"""
+        """
+        Brief: Test the connection and parameters for database access.
+        Return: OK if could establish a connection and access the database; ERROR otherwise.
+        """
         if self.__connect() == ERROR:
             return ERROR
 
@@ -41,9 +41,9 @@ class Pgcom:
             return OK
 
     def checkTables(self, user_tables):
-	"""
-	Brief: Verifies that there are the standard tables and create it if there are no tables.
-	"""
+        """
+        Brief: Verifies that there are the standard tables and create it if there are no tables.
+        """
         if len(user_tables) == 0:
             return OK
 
@@ -113,7 +113,7 @@ class Pgcom:
     def getRequisitions(self, status):
 
         if self.__connect() == OK:
-            query = "SELECT %s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, TABLE_SMS, status)
+            query = "SELECT %s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, TABLE_SMS, status)
             ret = self.__query(query)
             self.__disconnect()
             return ret
@@ -146,6 +146,7 @@ class Pgcom:
             # mount a dictionary with the data #
             data = data[0]
             req_dict = {DATA_ORIG:data[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
+            # remove blank spaces from dest field #
             req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1] = req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1][0:8]
             return req_dict
 
@@ -156,11 +157,11 @@ class Pgcom:
 #    Private functions     #
 #--------------------------#
     def __connect(self):
-	"""
-	Brief: The functions must connect to the database before every access to him.
-	Param: cursor_type This parameter defines the type of interaction that the object will have with the database.
-	Return: OK if the connection was established; ERROR otherwise.
-	"""
+        """
+        Brief: The functions must connect to the database before every access to him.
+        Param: cursor_type This parameter defines the type of interaction that the object will have with the database.
+        Return: OK if the connection was established; ERROR otherwise.
+        """
         try:
             self.conn = psycopg2.connect("\
             dbname=%s\
@@ -177,10 +178,10 @@ class Pgcom:
             return ERROR
 
     def __disconnect(self):
-	"""
-	Brief: Commit the changes and close the communication with the database.
-	Return: OK if everything went fine; ERROR if any exception was caught.
-	"""
+        """
+        Brief: Commit the changes and close the communication with the database.
+        Return: OK if everything went fine; ERROR if any exception was caught.
+        """
         try:
             self.conn.commit()
             self.cursor.close()
@@ -192,11 +193,11 @@ class Pgcom:
             return ERROR
 
     def __query(self, query):
-	"""
-	Brief: Send a query to the DBMS.
-	Param: query The query to be sent.
-	Return: What the DBMS returns for the query; INVALID if something went wrong.
-	"""
+        """
+        Brief: Send a query to the DBMS.
+        Param: query The query to be sent.
+        Return: What the DBMS returns for the query; INVALID if something went wrong.
+        """
         try:
             self.cursor.execute(query)
             return self.cursor.fetchall()
@@ -219,14 +220,15 @@ class Pgcom:
 
             if table_type == TABLE_SMS:
                 query = "CREATE TABLE %s (\
-                 orig CHAR(10),\
-                 dest CHAR(449),\
-                  msg CHAR(150),\
-                 oper INT,\
-                 blow CHAR(12),\
-                 stat INT,\
-                count SERIAL PRIMARY KEY\
-                );" % (TABLE_SMS)
+                     %s CHAR(10),\
+                     %s CHAR(449),\
+                     %s CHAR(150),\
+                     %s INT,\
+                     %s BOOLEAN,\
+                     %s TIMESTAMP,\
+                     %s INT,\
+                     %s SERIAL PRIMARY KEY\
+                );" % (TABLE_SMS, DATA_ORIG, DATA_DESTN, DATA_MSG, DATA_OPER, DATA_SEND, DATA_BLOW, DATA_STATUS, DATA_ID)
 
                 self.cursor.execute(query)
                 return OK
