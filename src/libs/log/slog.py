@@ -13,9 +13,9 @@ class slog:
 # Brief: start the object and define the log file path
 # Param: directory The log file path, the log name is defined in libs.include.include
 ##
-	def __init__(self, directory):
-		self.directory = directory
-		self.shared = shared()
+    def __init__(self, directory):
+        self.directory = directory
+        self.shared = shared()
 
 ##
 # Brief: create a log message with date, level, name of the caller function and any content.
@@ -24,43 +24,43 @@ class slog:
 # Param: content The message to logging.
 # Return: OK if the message was logged; ERROR if there are any error.
 ##
-	def LOG(self, level=LOG_INFO, callerName="main", content=EMPTY):
-		try:
-			# makeDate #
-			path = "%s" % (self.directory)
-			file = open(path, "a")
-			
-			if level == LOG_INFO:
-				lmsg = "INFO"
-			elif level == LOG_ERROR:
-				lmsg = "ERROR"
-			elif level == LOG_CRITICAL:
-				lmsg = "CRITICAL"
+    def LOG(self, level=LOG_INFO, callerName="system", content=EMPTY):
+        try:
+            # makeDate #
+            path = "%s" % (self.directory)
+            file = open(path, "a")
+            
+            if level == LOG_INFO:
+                lmsg = "INFO"
+            elif level == LOG_ERROR:
+                lmsg = "ERROR"
+            elif level == LOG_CRITICAL:
+                lmsg = "CRITICAL"
 
-			file.write("%s - LOG LEVEL %s -- from %s -- message: %s\n" % (self.shared.makeTime(), lmsg, callerName, content))
-			file.close()
+            file.write("%s - LOG LEVEL %s -- from %s -- message: %s\n" % (self.shared.makeTime(), lmsg, callerName, content))
+            file.close()
 
-			return OK
+            return OK
 
-		except IOError as (errno, strerror):
-			print "I/O error({0}): {1}".format(errno, strerror)
-			return ERROR
+        except IOError as (errno, strerror):
+            print "I/O error({0}): {1}".format(errno, strerror)
+            return ERROR
 ##
 # Brief: clean all the content of the log file.
 # Return: OK if the message was logged; ERROR if there are any error.
 ##
-	def CLEAN(self, path):
-		try:
-			file = open(path, "w")
-			file.close()
+    def CLEAN(self, path):
+        try:
+            file = open(path, "w")
+            file.close()
 
-			return OK
+            return OK
 
-		except IOError as (errno, strerror):
-			print "I/O error({0}): {1}".format(errno, strerror)
-			return ERROR
+        except IOError as (errno, strerror):
+            print "I/O error({0}): {1}".format(errno, strerror)
+            return ERROR
 
-	# maybe put in shared libs #
-	def makeDate():
-		pass
+    # maybe put in shared libs #
+    def makeDate():
+        pass
 

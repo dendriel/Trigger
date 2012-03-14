@@ -84,21 +84,11 @@ class Manager:
 
                 # if is to be sent as soon as possible #
                 elif req[SEND] == True:
-                    self.log.LOG(content="changing status for %d" % req[ID])
                     self.completeRequisition(req[ID])
-                    if self.dbcom.changeRequisitionStatus(req[ID], SENT) == ERROR:
-                        self.log.LOG(LOG_CRITICAL, "manager.sendService()", "Failed to change requisition status. Requisiton id=\"%d\"" % req[ID])
-                    else:
-                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton status changed to SENT. Requisiton id=\"%d\"" % req[ID])
 
-                # is not yet to be sent #
+                # is yet to be sent #
                 elif sub <= MIN_TIME_TO_SEND:
-                    self.log.LOG(content="changing status for %d" % req[ID])
                     self.completeRequisition(req[ID])
-                    if self.dbcom.changeRequisitionStatus(req[ID], SENT) == ERROR:
-                        self.log.LOG(LOG_CRITICAL, "manager.sendService()", "Failed to change requisition status. Requisiton id=\"%d\"" % req[ID])
-                    else:
-                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton status changed to SENT. Requisiton id=\"%d\"" % req[ID])
 
                 # should not fall here #
                 else:
@@ -115,5 +105,28 @@ class Manager:
 
     def completeRequisition(self, req_id):
 
+        ret = OK
         data_dict = self.dbcom.getDataFromRequisition(req_id)
-        print data_dict
+        message = ""
+        message += data_dict[DATA_ORIG]
+        message += ": " 
+        message += data_dict[DATA_MSG]
+
+        for destination in data_dict[DATA_DESTN]:
+            ret = OK # the sendSMS line is commented because i'm not rich
+            # and cant afford more credits to send SMS. =}
+            #if self.gsmcom.sendSMS(destination, message) != OK:
+            #    ret = ERROR
+
+        if ret == OK:
+            req_state = SENT
+        else:
+            req_state = FAILED
+
+        if self.dbcom.changeRequisitionStatus(req_id, req_state) == ERROR:
+            self.log.LOG(LOG_CRITICAL, "manager.compĺeteRequisition()", "Failed to change requisition status. Requisiton id=\"%d\"" % req_id)
+        else:
+            self.log.LOG(LOG_INFO, "manager.completeRequisition()", "Requisiton status changed to SENT. Requisiton id=\"%d\"" % req_id)
+
+        return
+

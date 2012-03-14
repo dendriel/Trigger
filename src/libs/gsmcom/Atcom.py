@@ -51,7 +51,6 @@ class Atcom:
             msg = ""
             while(self.serial.inWaiting() > 0):
                 msg += self.serial.readline()
-
             return msg
 
         except IOError, emsg:
@@ -96,19 +95,15 @@ class Atcom:
         if self._open_port() == ERROR:
             return ERROR
 
-        ret = OK
-
         self._read()
-        self._send("ATD")
+        self._send("ATI")
         ret = self._read()
-        self.log.LOG(content="answer [%s]" % ret)
-
         self._close_port()
-        if ret.find("OK") < 0 and ret.find("ok") < 0:
-            return INVALID
+
+        if ret.find(AT_OK) <= ERROR:
+            return ERROR
         else:
             return OK
-        
 
     def sendSMS(self, destination, content):
         """
@@ -133,13 +128,16 @@ class Atcom:
         # Confirm the command #
         self._send("\032")
 
+        sleep(1)
         answer = self._read()
+        self._close_port()
 
-        if answer.find("ERROR") > 0: #|| answer.find("+CMGS: 73") < 0:
-            self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Unexpected answer from module. Content: %s" % answer)
+        # TODO this verification does not work
+        if answer.find(AT_ERROR_ST) >= OK:
+            self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. Answer Content: %s" % answer)
             return INVALID
 
-        self.log.LOG(LOG_INFO, "gsmcom.sendSMS()", "Answer: %s" % answer)
+        self.log.LOG(LOG_INFO, "gsmcom.sendSMS()", "Message sent. Answer Content: %s" % answer)
 
-        self._close_port()
         return OK
+

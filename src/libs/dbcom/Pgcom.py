@@ -140,14 +140,14 @@ class Pgcom:
         """
         if self.__connect() == OK:
             query = "SELECT %s FROM %s WHERE %s=%d" % ((DATA_ORIG+","+DATA_DESTN+","+DATA_MSG), TABLE_SMS, DATA_ID, req_id)
-            self.log.LOG(content="%s" % query)
             data = self.__query(query)
             self.__disconnect()
             # mount a dictionary with the data #
             data = data[0]
-            req_dict = {DATA_ORIG:data[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
+            req_dict = {DATA_ORIG:data[0].split()[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
             # remove blank spaces from dest field #
             req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1] = req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1][0:8]
+            # remove blank spaces from orig field #
             return req_dict
 
         else:
@@ -220,7 +220,7 @@ class Pgcom:
 
             if table_type == TABLE_SMS:
                 query = "CREATE TABLE %s (\
-                     %s CHAR(10),\
+                     %s CHAR(7),\
                      %s CHAR(449),\
                      %s CHAR(150),\
                      %s INT,\

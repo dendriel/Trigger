@@ -82,3 +82,9 @@ NULL_LIST = []
 MIN_TIME_TO_SEND = 10 # The minimum "at least" time to send #
 MAX_TIME_TO_SEND = -60 # The maximum time before the blow to send #
 SEPARATOR_CHAR = ','
+
+
+# AT RETURN VALUES #
+AT_OK = "0"
+AT_ERROR = "4"
+AT_ERROR_ST = "ERROR"

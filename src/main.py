@@ -43,7 +43,7 @@ class trigger:
         """
         Brief: Call all necessary functions and goes into the connection loop
         """
-        self.log.LOG(LOG_INFO, "sms", "Starting the system.")
+        self.log.LOG(LOG_INFO, "system.start()", "Starting the system...")
 
         # Test tcp/socket connection #
         self.checkConnection()
@@ -57,7 +57,7 @@ class trigger:
         # Launch thread that will monitor SMS events #
         self.launchMonitorThread()
 
-        self.log.LOG(LOG_INFO, "sms", "System started.")
+        self.log.LOG(LOG_INFO, "system.start()", "System started.")
 
         # Start to listening tcp socket #
         self.lookForConnection()
@@ -75,49 +75,49 @@ class trigger:
             self.channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.channel.bind((self.address, self.port))
             self.channel.listen(MAX_CONNECTIONS)
-            self.log.LOG(LOG_INFO, "sms", "System \"Listening Channel\" is OK.")
+            self.log.LOG(LOG_INFO, "system.start()", "System \"Listening Channel\" is OK.")
 
         except socket.error, msg:
             self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "sms.checkConnection()", "Failed to set the server listening connection. Error: %s. Aborting the system startup." % msg)
+            self.log.LOG(LOG_CRITICAL, "system.start.checkConnection()", "Failed to set the server listening connection. Error: %s. Aborting the system startup." % msg)
             exit(-1)
 
     def checkDatabase(self):
 
         if self.dbcom.checkConnection() == ERROR:
             self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to set the database connection. Aborting the system startup.")
+            self.log.LOG(LOG_CRITICAL, "system.start.checkDatabase()", "Failed to set the database connection. Aborting the system startup.")
             exit(-1)
 
         elif self.dbcom.checkTables(DB_TABLES) == ERROR:
             self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "sms.checkDatabase()", "Failed to check the default tables of the database. Aborting the system startup.")
+            self.log.LOG(LOG_CRITICAL, "system.start.checkDatabase()", "Failed to check the default tables of the database. Aborting the system startup.")
             exit(-1)
 
         else:
-            self.log.LOG(LOG_INFO, "sms", "Tables of the database are OK.") 
+            self.log.LOG(LOG_INFO, "system.start()", "Tables of the database are OK.") 
             return
 
     def launchMonitorThread(self):
 
         if self.manager.launchMonitor() != OK:
-            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to launch monitor thread. Halting...")
+            self.log.LOG(LOG_CRITICAL, "system.start.launchMonitorThread()", "Failed to launch monitor thread. Halting...")
             self.channel.close()
             sys.exit(0)
 
         else:
-            self.log.LOG(LOG_INFO, "sms", "Manager thread launched.")
+            self.log.LOG(LOG_INFO, "system.start()", "Manager thread launched.")
             return
 
     def testGsmCommunication(self):
 
         if self.gsmcom.testCommunication() != OK:
-            self.log.LOG(LOG_CRITICAL, "system.start()", "Failed to communicate with GSM module. Halting...")
+            self.log.LOG(LOG_CRITICAL, "system.start.testGsmCommunication()", "Failed to communicate with GSM module. Halting...")
             self.channel.close()
             sys.exit(0)
 
         else:
-            self.log.LOG(LOG_INFO, "sms", "GSM module is OK.")
+            self.log.LOG(LOG_INFO, "system.start()", "GSM module is OK.")
             return
 
     def lookForConnection(self):
@@ -127,31 +127,31 @@ class trigger:
         while True:
 
             try:
-        	(client_channel, address) = self.channel.accept()
-        	self.log.LOG(LOG_INFO, "sms", "Client from %s has been connected." % str(address))
-        
+                (client_channel, address) = self.channel.accept()
+                self.log.LOG(LOG_INFO, "sms", "Client from %s has been connected." % str(address))
+
             except socket.error, emsg:
-        	self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "lookForConnection()", "Failed to receive client connection. Error: %s" % str(emsg))
-        	continue
+                self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "lookForConnection()", "Failed to receive client connection. Error: %s" % str(emsg))
+                continue
 
             try:
-        	cmsg = client_channel.recv(MSG_SIZE)
-        	result = self.processMessage(cmsg, client_channel)
-        
-        	if result == OK:
+                cmsg = client_channel.recv(MSG_SIZE)
+                result = self.processMessage(cmsg, client_channel)
+
+                if result == OK:
                     self.log.LOG(LOG_INFO, "sms.lookForConnection()", "Message from %s successfully processed." % str(address))
 
-        	elif result == ERROR:
-        	    self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Message from %s can not be processed." % str(address))
+                elif result == ERROR:
+                    self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Message from %s can not be processed." % str(address))
 
-        	elif result == INVALID:
-        	    self.log.LOG(LOG_INFO, "sms.lookForConnection()", "Unknow client attempted to send a command, but the package was dropped.")
-        
-        	client_channel.close()
-    
-       	    except socket.error, emsg:
-    		self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Failed to receive client message. Error: %s" % emsg)
-    		continue
+                elif result == INVALID:
+                    self.log.LOG(LOG_INFO, "sms.lookForConnection()", "Unknow client attempted to send a command, but the package was dropped.")
+
+                client_channel.close()
+
+            except socket.error, emsg:
+                self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Failed to receive client message. Error: %s" % emsg)
+            continue
 
     def processMessage (self, cmsg, client_channel):
         """
@@ -180,22 +180,15 @@ class trigger:
             return OK
         
         elif CID == MANAGER:
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from MANAGER was received.")	
+            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from MANAGER was received.")    
             self.doManagerAction(cmsg)
         
         else:
             self.log.LOG(LOG_INFO, "sms.processMessage()", "Received message has an invalid ID: %d" % CID)
             return INVALID
 
-
-
-
-
-
-
-
 #---------------------------------------------------------#
-# 			System start 			  #
+#             System bootstrap                            #
 #---------------------------------------------------------#
 if __name__ == "__main__":
 
