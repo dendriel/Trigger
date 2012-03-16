@@ -27,6 +27,7 @@ DATA_SEND   = "send"    # A flag that informs if the requisition is to be execut
 DATA_BLOW   = "blow"    # The date/time when the requisition will be sent.               #
 DATA_STATUS = "stat"    # The state of the requisition. *See requisition states*         #
 DATA_ID     = "id"      # The unique identifier of the requisition.                      #
+DATA_DATE   = "date"    # When the requisition was sent to the system.                   #
 
 # REQUISITION STATES #
 ACTIVE   = 0
@@ -45,7 +46,7 @@ MSG_SIZE = 4096
 
 
 # FILE NAMES #
-SMS_LOGNAME = 	"sms.log"
+SMS_LOGNAME   = "sms.log"
 DBCOM_LOGNAME = "dbcom.log"
 ALARM_LOGNAME = "alarm.log"
 
@@ -87,4 +88,4 @@ SEPARATOR_CHAR = ','
 # AT RETURN VALUES #
 AT_OK = "0"
 AT_ERROR = "4"
-AT_ERROR_ST = "ERROR"
+AT_ERROR_ST = "ERROR" # at error string #

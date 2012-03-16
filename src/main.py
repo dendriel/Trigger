@@ -116,6 +116,11 @@ class trigger:
             self.channel.close()
             sys.exit(0)
 
+        elif self.gsmcom.configureModule() != OK:
+            self.log.LOG(LOG_CRITICAL, "system.start.testGsmCommunication()", "Failed to configure GSM module. Halting...")
+            self.channel.close()
+            sys.exit(0)
+
         else:
             self.log.LOG(LOG_INFO, "system.start()", "GSM module is OK.")
             return

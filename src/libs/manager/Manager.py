@@ -3,9 +3,7 @@ import socket
 import time
 from threading import Thread
 from datetime import datetime
-from libs.log.slog import slog
 from libs.defines.defines import *
-from libs.shared.shared import shared
 from libs.dbcom.Pgcom import Pgcom
 
 # Macros #
@@ -19,7 +17,6 @@ class Manager:
     def __init__(self, log_obj, gsmcom):
 
         self.log = log_obj
-        self.shared = shared()
         self.monitor_thread = ''
         self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
         self.gsmcom = gsmcom
@@ -45,7 +42,7 @@ class Manager:
         while(True):
 
             self.sendService()
-            # do receiveService()
+            self.receiveService()
             time.sleep(MNGR_THRD_SLEEP)
 
     def sendService(self):
@@ -66,7 +63,7 @@ class Manager:
                 active_list == active_list[0]
 
             now = datetime.now()
-            now = now.replace(second=0, microsecond=0)
+            now = now.replace(microsecond=0)
 
             # look for requisitions to send #
             for req in active_list:
@@ -75,12 +72,12 @@ class Manager:
                 # change from timedelta to int #
                 sub = sub.total_seconds()
 
-                # if it delayed ore than the maximum #
+                # if it delayed more than the maximum #
                 if sub < MAX_TIME_TO_SEND:
                     if self.dbcom.changeRequisitionStatus(req[ID], FAILED) == ERROR:
                         self.log.LOG(LOG_CRITICAL, "manager.sendService()", "Failed to change requisition status. Requisiton id=\"%d\"" % req[ID])
                     else:
-                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton status changed to FAILED. Requisiton id=\"%d\"" % req[ID])
+                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton FAILED due to timeout to blow (%ds). Requisiton id=\"%d\"" % (sub, req[ID]))
 
                 # if is to be sent as soon as possible #
                 elif req[SEND] == True:
@@ -89,13 +86,6 @@ class Manager:
                 # is yet to be sent #
                 elif sub <= MIN_TIME_TO_SEND:
                     self.completeRequisition(req[ID])
-
-                # should not fall here #
-                else:
-                    if self.dbcom.changeRequisitionStatus(req[ID], FAILED) == ERROR:
-                        self.log.LOG(LOG_CRITICAL, "manager.sendService()", "Failed to change requisition status. Requisiton id=\"%d\"" % req[ID])
-                    else:
-                        self.log.LOG(LOG_INFO, "manager.sendService()", "Requisiton status changed to FAILED. Requisiton id=\"%d\"" % req[ID])
 
             return OK
 
@@ -113,10 +103,11 @@ class Manager:
         message += data_dict[DATA_MSG]
 
         for destination in data_dict[DATA_DESTN]:
-            ret = OK # the sendSMS line is commented because i'm not rich
-            # and cant afford more credits to send SMS. =}
-            #if self.gsmcom.sendSMS(destination, message) != OK:
-            #    ret = ERROR
+            ret = OK 
+            # !(the sendSMS line is commented because i'm not rich
+            # and cant afford more credits to send SMS. =})
+            if self.gsmcom.sendSMS(destination, message) != OK:
+                ret = ERROR
 
         if ret == OK:
             req_state = SENT
@@ -130,3 +121,38 @@ class Manager:
 
         return
 
+    def receiveService(self):
+        """
+        Brief: Question to the GSM module for new messages and process if there are any.
+        Return: None.
+        """
+        msg_count = self.gsmcom.getMessagesCount()
+        if msg_count == ERROR:
+            self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to retrieve messages count. Can not go forward.")
+
+        # recover data from the GSM module #
+        for msg_index in range(msg_count):
+            msg_index += 1
+            msg_data = self.gsmcom.getMessageByIndex(msg_index)
+
+            if msg_data == ERROR:
+                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to register requisition from SIMCARD ID [%d]. Ignoring..." % msg_index)
+                self.gsmcom.deleteMessage(msg_index)
+                continue
+
+            self.log.LOG(content=msg_data)
+            continue # from here to bottom the functions do not exist yet #
+            msg_req = self.mountRequisition(msg_data)
+
+            if msg_req != ERROR:
+                if self.dbcom.registerRequisition(msg_req) != OK:
+                    if self.dbcom.registerRequisition(msg_req) != OK:
+                        self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to register requisition from SIMCARD ID [%d]. Ignoring..." % msg_index)
+                    else:
+                        self.log.LOG(LOG_INFO, "manager", "Registered new requisition via GSM module.") # TODO show what is the req ID in the db #
+                else:
+                    self.log.LOG(LOG_INFO, "manager", "Registered new requisition via GSM module.") # TODO show what is the req ID in the db #
+
+            self.gsmcom.deleteMessage(msg_index)
+
+        return

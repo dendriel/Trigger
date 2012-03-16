@@ -1,11 +1,12 @@
  # -*- coding: UTF-8 -*-
-import sys
 import serial
 from time import sleep
-from mx.DateTime import now
 from libs.defines.defines import *
 from libs.log.slog import slog
 
+# TODO Remove all the magic numbers and make macros #
+#     from the strings parameters. PLEASE!! I can't #
+#     live with that...                             #
 TIME_BETWEEN_AT = 0.2
 
 class Atcom:
@@ -37,6 +38,7 @@ class Atcom:
         try:
             self.serial.close()
             return OK
+
         except IOError, emsg:
             self.log.LOG(LOG_ERROR, "gsmcom", "Attempt to close the serial port failed. Error: %s" % emsg)
             return ERROR
@@ -61,10 +63,10 @@ class Atcom:
         """
         Brief: Send content in serial buffer.
         Param: msg The content to be sent.
-        Return: The answer content;
+        Return: OK if could send the content; ERROR otherwise.
         """        
         try:
-            self.serial.write(msg+'\n\r')
+            self.serial.write(msg+"\r")
             sleep(TIME_BETWEEN_AT)
 
         except IOError, emsg:
@@ -77,15 +79,10 @@ class Atcom:
         #r_msg = self._read()
         return OK
 
-    def info (self):
-        """
-        Brief: Return the configuration parameters to be used.
-        """
-        return "Valores utilizados: %s %s %s " % (self.wport, self.bitrate, self.mtype)
-
 ###########################
 # Specific functions      #
 ###########################
+
     def testCommunication(self):
         """
         Brief: Test if the gsm module is avaliable.
@@ -99,11 +96,35 @@ class Atcom:
         self._send("ATI")
         ret = self._read()
         self._close_port()
-
+        # TODO do this thing more acurrate
         if ret.find(AT_OK) <= ERROR:
             return ERROR
         else:
             return OK
+
+    def info (self):
+        """
+        Brief: Return the configuration parameters to be used.
+        """
+        return "Configured values: %s %s %s " % (self.wport, self.bitrate, self.mtype)
+
+    def configureModule(self):
+        """
+        Brief: Set module configurations to send and recevive SMS.
+        Return: OK if the alarm was sent; ERROR in whatever
+              other case.
+        """
+        if self._open_port() == ERROR:
+            return ERROR
+
+        # Put the modem in SMS text mode #
+        self._send("AT+CMGF=1")
+        self._read() # AT+CMGF? -> +CMGF: 1 #
+        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"")
+        self._read() # AT+CPMS? -> +CPMS: "SM",0,50,"SM",0,50,"SM",0,50 #
+
+        self._close_port()
+        return OK
 
     def sendSMS(self, destination, content):
         """
@@ -116,11 +137,9 @@ class Atcom:
         """
         if self._open_port() == ERROR:
             return ERROR
-        
+
         # Clear the content of the rx buffer #
         self._read()
-        # Setting something important #
-        self._send("AT+CMGF=1")
         # Starting the command #
         self._send("AT+CMGS=\"%s\"" % destination)
         # Writing the content #
@@ -132,7 +151,7 @@ class Atcom:
         answer = self._read()
         self._close_port()
 
-        # TODO this verification does not work
+        # TODO this verification does not really work
         if answer.find(AT_ERROR_ST) >= OK:
             self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. Answer Content: %s" % answer)
             return INVALID
@@ -140,4 +159,84 @@ class Atcom:
         self.log.LOG(LOG_INFO, "gsmcom.sendSMS()", "Message sent. Answer Content: %s" % answer)
 
         return OK
+
+    def getAllNewMessages(self):
+        """
+        Brief: Ask the module by "REC UNREAD" (read: NEW) messages.
+        Return: Should returns a dictionary with the new messages.
+        """
+
+        if self._open_port() == ERROR:
+            return ERROR
+
+        self._read()
+        self._send("AT+CMGL=\"REC UNREAD\"")
+        ret = self._read()
+        # TODO mount an array with the orig, code, message #
+        self._close_port()
+        return ret
+
+    def getMessagesCount(self):
+        """
+        Brief: Ask the module for the SMS messages number.
+        Return: The SMS messages number.
+        """
+        if self._open_port() == ERROR:
+            return ERROR
+
+        self._read()
+        self._send("AT+CPMS?")
+        answer = self._read() # 'at+cpms?\r+CPMS: "SM",3,50,"SM",3,50,"SM",3,50\r\n0\r' #
+
+        # handle the answer #
+        answer = answer.split() # ['at+cpms?', '+CPMS:', '"SM",3,50,"SM",3,50,"SM",3,50', '0'] #
+        answer = answer[2].split(",") # ['"SM"', '3', '50', '"SM"', '3', '50', '"SM"', '3', '50'] #
+
+        try:
+            # ensures that the correct column will be returned #
+            for index in range(len(answer)):
+                if answer[index] == '"SM"':
+                    return int(answer[index+1])
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
+
+        self._close_port()
+        return ERROR
+
+    def getMessageByIndex(self, msg_index):
+        """
+        Brief: Ask the module for a specific message.
+        Param: msg_index The position of the message in the module.
+        Return: A dict with the data from the recovered message.
+        """
+        if self._open_port() == ERROR:
+            return ERROR
+
+        SMS_HEADER_FIELDS = 5 # header + command status (OK/ERROR)
+        SMS_MSG_OFFSET = 4
+
+        self._read()
+        self._send("AT+CMGR=%d" % msg_index)
+
+        try:
+            answer = self._read()
+            answer = answer.split() # ['at+cmgr=1', '+CMGR:', '"REC', 'UNREAD","04896710721",,"12/03/15,12:34:20-12"', 'vitor:', 'dosiajdadada', '0'] #
+            answer_sub = answer[3].split(",") # ['UNREAD"', '"04896710721"', '', '"12/03/15', '12:34:20-12"'] #
+            orig = answer_sub[1].split("\"")[1][3:] # '96710721' #
+            date = answer_sub[3].split("\"")[1] + " " + answer_sub[4].split("\"")[0] # '12/03/15 12:34:20-12' #
+            msg = ""
+            msg_blocks = len(answer) - SMS_HEADER_FIELDS #
+
+            for count in range(msg_blocks):
+                msg += answer[SMS_MSG_OFFSET+count] # vitor:dosiajdadada #
+
+            sms_dict = {DATA_ORIG:orig, DATA_DATE:date, DATA_MSG:msg}
+            self._close_port()
+            return sms_dict
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
 
