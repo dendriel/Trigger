@@ -94,9 +94,9 @@ class Pgcom:
         """
         if self.__connect() == OK:
             query = "INSERT INTO %s\
-             (orig, dest, msg, oper, blow, stat) VALUES\
+             (orig, dest, msg, oper, send, blow, stat) VALUES\
              ('%s', '%s', '%s', %d, '%s', %d)"\
-             % (TABLE_SMS, data[DATA_ORG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_BLOW], ACTIVE)
+             % (TABLE_SMS, data[DATA_ORIG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_SEND], data[DATA_BLOW], ACTIVE)
             self.__query(query)
 
             if self.__disconnect() == ERROR:

@@ -29,7 +29,7 @@ class trigger:
             self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
 
             if gsmcom_type == GSM_ATCOM:
-                self.gsmcom = Atcom(log_obj=self.log)
+                self.gsmcom = Atcom(log_obj=self.log, wport="/dev/ttyUSB0")
             else:
                 raise Exception
 

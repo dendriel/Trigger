@@ -120,7 +120,8 @@ class Atcom:
         # Put the modem in SMS text mode #
         self._send("AT+CMGF=1")
         self._read() # AT+CMGF? -> +CMGF: 1 #
-        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"")
+        # Preferred Message Storage #
+        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"") # validate the answer bellow #
         self._read() # AT+CPMS? -> +CPMS: "SM",0,50,"SM",0,50,"SM",0,50 #
 
         self._close_port()
@@ -184,12 +185,19 @@ class Atcom:
         if self._open_port() == ERROR:
             return ERROR
 
+        ANSWER_EXPECTED_FIELDS = 9
+
         self._read()
         self._send("AT+CPMS?")
         answer = self._read() # 'at+cpms?\r+CPMS: "SM",3,50,"SM",3,50,"SM",3,50\r\n0\r' #
 
         # handle the answer #
         answer = answer.split() # ['at+cpms?', '+CPMS:', '"SM",3,50,"SM",3,50,"SM",3,50', '0'] #
+
+        if len(answer) != ANSWER_EXPECTED_FIELDS: 
+            self._close_port()
+            return ERROR
+
         answer = answer[2].split(",") # ['"SM"', '3', '50', '"SM"', '3', '50', '"SM"', '3', '50'] #
 
         try:
@@ -240,3 +248,19 @@ class Atcom:
             self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+    def deleteMessage(self, msg_index):
+        """
+        Brief: Delete message by its index.
+        Return: OK if could delete the message;
+                ERROR otherwise.
+        """
+        if self._open_port() == ERROR:
+            return ERROR
+
+        self._send("AT+CMGD=%d" % msg_index)
+        answer = self._read()
+
+        # TODO validate answer #
+
+        self._close_port()
+        return OK

@@ -136,15 +136,21 @@ class Manager:
             msg_data = self.gsmcom.getMessageByIndex(msg_index)
 
             if msg_data == ERROR:
-                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to register requisition from SIMCARD ID [%d]. Ignoring..." % msg_index)
+                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to register requisition from module, message ID [%d]. Ignoring..." % msg_index)
                 self.gsmcom.deleteMessage(msg_index)
                 continue
 
-            self.log.LOG(content=msg_data)
-            continue # from here to bottom the functions do not exist yet #
             msg_req = self.mountRequisition(msg_data)
 
-            if msg_req != ERROR:
+            if msg_req == ERROR:
+                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to mount requisition. Message ID [%d]. Ignoring..." % msg_index)
+                continue
+
+            elif msg_req == INVALID:
+                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Invalid requisition received. Message ID [%d]. Ignoring..." % msg_index)
+                continue
+
+            else:
                 if self.dbcom.registerRequisition(msg_req) != OK:
                     if self.dbcom.registerRequisition(msg_req) != OK:
                         self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Failed to register requisition from SIMCARD ID [%d]. Ignoring..." % msg_index)
@@ -156,3 +162,56 @@ class Manager:
             self.gsmcom.deleteMessage(msg_index)
 
         return
+
+    def mountRequisition(self, msg_data):
+        """
+        Brief: Validate and mount a service requisition.
+        Param: msg_data The data package.
+        Return: A dict with the data requisition if it is valid;
+                INVALID if the requisition could not be understood.
+                ERROR otherwise.
+        """
+        # call the validate user page and pass the orig to him. msg_data[DATA_ORIG]
+        if validateOrigin(msg_data[DATA_ORIG]) == ERROR:
+            return ERROR
+
+        msg_values = getValuesFromMessage(msg_data[DATA_MSG])
+        if msg_values == INVALID:
+            return INVALID
+        # dest_list -> needs to retrieve specified group cellphone address
+
+        req_dict = {DATA_ORIG: , DATA_DESTN: dest_list, DATA_MSG: msg_data[DATA_MSG], DATA_OPER: VIVO, DATA_BLOW: blow}
+        return req_dict
+
+    def getValuesFromMessage(self, message_body):
+        """
+        Brief: Retrieve the values from the message if he is consistent.
+        Param: msg_data The body text from the message.
+        Return: A dict with data from the requisition;
+                ERROR if something went wrong.
+        """
+        MIN_DATA_VALUES = 3 # minimum fields needed in the message body #
+        try:
+            values = message_body.split(",")
+
+            if len(values) < MIN_DATA_VALUES:
+            orig = values[0][0:MAX_ORIG_LEN]
+            dest_code = values[1][0:MAX_DEST_CODE_LEN]
+
+            # TODO try to recover a date/time value; if was not possible, add the field to the message
+            
+
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
+
+
+
+
+
+
+
+
+
+
