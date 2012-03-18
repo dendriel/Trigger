@@ -87,9 +87,11 @@ EMPTY = ""
 NULL_LIST = []
 MIN_TIME_TO_SEND = 10 # The minimum "at least" time to send #
 MAX_TIME_TO_SEND = -60 # The maximum time before the blow to send #
-SEPARATOR_CHAR = ','
-MAX_ORIG_LEN = 10       # Maximum string length to identify the origin            #
+SEPARATOR_CHAR = '@'
+SEPARATOR_CHAR_FOR_DB = ','
+MAX_ORIG_LEN = 7       # Maximum string length to identify the origin            #
 MAX_DEST_CODE_LEN = 7   # Maximum string length to identify the destination group #
+MODULE_PORT = "/dev/ttyACM1"
 
 
 # AT RETURN VALUES #

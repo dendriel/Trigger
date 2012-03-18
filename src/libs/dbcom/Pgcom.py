@@ -92,22 +92,27 @@ class Pgcom:
         Param: data The data for the new row.
         Return: OK if the new entry was successful inserted. ERROR if something went wrong.
         """
-        if self.__connect() == OK:
-            query = "INSERT INTO %s\
-             (orig, dest, msg, oper, send, blow, stat) VALUES\
-             ('%s', '%s', '%s', %d, '%s', %d)"\
-             % (TABLE_SMS, data[DATA_ORIG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_SEND], data[DATA_BLOW], ACTIVE)
-            self.__query(query)
-
-            if self.__disconnect() == ERROR:
-                self.log.LOG(LOG_CRITICAL, "dbcom", "Failed to disconnect from the DBMS.")
+        try:
+            if self.__connect() == OK:
+                query = "INSERT INTO %s\
+                 (orig, dest, msg, oper, send, blow, stat) VALUES\
+                 ('%s', '%s', '%s', %d, '%s', '%s', %d)"\
+                 % (TABLE_SMS, data[DATA_ORIG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_SEND], data[DATA_BLOW], ACTIVE)
+                self.__query(query)
+    
+                if self.__disconnect() == ERROR:
+                    self.log.LOG(LOG_CRITICAL, "dbcom", "Failed to disconnect from the DBMS.")
+                    return ERROR
+    
+                self.log.LOG(LOG_INFO, "dbcom", "New register inserted into database.")
+    
+                return OK
+    
+            else:
                 return ERROR
 
-            self.log.LOG(LOG_INFO, "dbcom", "New register inseted into database. Table %s; Values: ('%s', '%s', '%s', %d, '%s', %d)"\
-                      % (TABLE_SMS, data[DATA_ORG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_BLOW], ACTIVE))
-            return OK
-
-        else:
+        except Exception, exc:
+            self.log.LOG(LOG_CRITICAL, "dbcom.regiserRequisition()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
     def getRequisitions(self, status):
@@ -144,10 +149,9 @@ class Pgcom:
             self.__disconnect()
             # mount a dictionary with the data #
             data = data[0]
-            req_dict = {DATA_ORIG:data[0].split()[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR), DATA_MSG:data[2]}
+            req_dict = {DATA_ORIG:data[0].split()[0], DATA_DESTN:data[1].split(SEPARATOR_CHAR_FOR_DB), DATA_MSG:data[2]}
             # remove blank spaces from dest field #
             req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1] = req_dict[DATA_DESTN][len(req_dict[DATA_DESTN])-1][0:8]
-            # remove blank spaces from orig field #
             return req_dict
 
         else:
@@ -249,7 +253,7 @@ if __name__ == "__main__":
     dbcom = Pgcom("localhost", "trigger", "trigger", "trigger", 5432, log)
     if dbcom.checkConnection() == OK:
         dbcom.checkTables((TABLE_SMS,))
-        data = {DATA_ORG: "vitor",\
+        data = {DATA_ORIG: "vitor",\
             DATA_MSG: "Mensagem de teste =)",\
             DATA_BLOW: "121220122050",\
             DATA_OPER: 1,\
