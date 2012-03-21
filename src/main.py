@@ -1,12 +1,11 @@
 #! /usr/bin/python
 # -*-coding:utf-8-*-
-import socket
 import sys
 from time import *
 from threading import Thread
+from SimpleXMLRPCServer import SimpleXMLRPCServer
 from libs.log.slog import slog
 from libs.defines.defines import *
-from libs.shared.shared import shared
 from libs.dbcom.Pgcom import Pgcom
 from libs.gsmcom.Atcom import Atcom
 from libs.manager.Manager import Manager
@@ -16,13 +15,12 @@ class trigger:
     def __init__(self, address, port, gsmcom_type):
         """
         Brief: Just initializes the system. Bind socket and stuff. :>
-        Param: addres The IP to listen for connections.
+        Param: addres The IP to listen for connections;
         Param: port The port to listen for connections.
         Param: log The path to the log file.
         """
         self.address = address
         self.port = port
-        self.channel = ''
 
         try:
             self.log = slog(SYSTEM_LOG_PATH)
@@ -41,12 +39,12 @@ class trigger:
 
     def start(self):
         """
-        Brief: Call all necessary functions and goes into the connection loop
+        Brief: Call all necessary functions and goes into the connection loop.
         """
         self.log.LOG(LOG_INFO, "system.start()", "Starting the system...")
 
-        # Test tcp/socket connection #
-        self.checkConnection()
+        # Configure parameters and functions into XML-RPC Server #
+        self.configureXMLRPCServer()
 
         # Test dbcom #
         self.checkDatabase()
@@ -60,37 +58,20 @@ class trigger:
         self.log.LOG(LOG_INFO, "system.start()", "System started.")
 
         # Start to listening tcp socket #
-        self.lookForConnection()
+        self.startXMLRPCServer()
 
-        self.channel.close()
-        sys.exit(0)
+        exit(0)
 
-    def checkConnection(self):
-        """
-        Brief: Set the system connection and bind to
-        Return: OK if everything went fine; Or halt the system if unsucess
-        """
-        try:
-            self.channel = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.channel.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.channel.bind((self.address, self.port))
-            self.channel.listen(MAX_CONNECTIONS)
-            self.log.LOG(LOG_INFO, "system.start()", "System \"Listening Channel\" is OK.")
-
-        except socket.error, msg:
-            self.channel.close()
-            self.log.LOG(LOG_CRITICAL, "system.start.checkConnection()", "Failed to set the server listening connection. Error: %s. Aborting the system startup." % msg)
-            exit(-1)
 
     def checkDatabase(self):
-
+        """
+        Brief: Check database and initialize his tables.
+        """
         if self.dbcom.checkConnection() == ERROR:
-            self.channel.close()
             self.log.LOG(LOG_CRITICAL, "system.start.checkDatabase()", "Failed to set the database connection. Aborting the system startup.")
             exit(-1)
 
         elif self.dbcom.checkTables(DB_TABLES) == ERROR:
-            self.channel.close()
             self.log.LOG(LOG_CRITICAL, "system.start.checkDatabase()", "Failed to check the default tables of the database. Aborting the system startup.")
             exit(-1)
 
@@ -99,10 +80,12 @@ class trigger:
             return
 
     def launchMonitorThread(self):
-
+        """
+        Brief: Try to launch Manager Thread. *The thread that will provide
+              all the SMS services*
+        """
         if self.manager.launchMonitor() != OK:
             self.log.LOG(LOG_CRITICAL, "system.start.launchMonitorThread()", "Failed to launch monitor thread. Halting...")
-            self.channel.close()
             sys.exit(0)
 
         else:
@@ -110,95 +93,96 @@ class trigger:
             return
 
     def testGsmCommunication(self):
-
+        """
+        Brief: Verify if the GSM Service is upline.
+        """
         if self.gsmcom.testCommunication() != OK:
             self.log.LOG(LOG_CRITICAL, "system.start.testGsmCommunication()", "Failed to communicate with GSM module. Halting...")
-            self.channel.close()
             sys.exit(0)
 
         elif self.gsmcom.configureModule() != OK:
             self.log.LOG(LOG_CRITICAL, "system.start.testGsmCommunication()", "Failed to configure GSM module. Halting...")
-            self.channel.close()
             sys.exit(0)
 
         else:
             self.log.LOG(LOG_INFO, "system.start()", "GSM module is OK.")
             return
 
-    def lookForConnection(self):
+    def configureXMLRPCServer(self):
         """
-        Brief: Wait for subsytems connections.
+        Brief: Configure and register functions into xml-rpc self.xmlrpc_server.
         """
-        while True:
+        try:
+            self.xmlrpc_server = SimpleXMLRPCServer((self.address, self.port))
+            self.xmlrpc_server.register_function(self.newRequisition)
+            self.xmlrpc_server.register_function(self.systemHalt)
+            self.xmlrpc_server.register_introspection_functions()
+            self.log.LOG(LOG_INFO, "system.start()", "XML-RPC Server configured.")
+            return
 
-            try:
-                (client_channel, address) = self.channel.accept()
-                self.log.LOG(LOG_INFO, "sms", "Client from %s has been connected." % str(address))
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "system.start.configureXMLRPCServer()", "Failed to configure XML-RPC Server parameters. %s: %s" % (exc.__class__.__name__, exc))
+            exit(-1)
 
-            except socket.error, emsg:
-                self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "lookForConnection()", "Failed to receive client connection. Error: %s" % str(emsg))
-                continue
-
-            try:
-                cmsg = client_channel.recv(MSG_SIZE)
-                result = self.processMessage(cmsg, client_channel)
-
-                if result == OK:
-                    self.log.LOG(LOG_INFO, "sms.lookForConnection()", "Message from %s successfully processed." % str(address))
-
-                elif result == ERROR:
-                    self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Message from %s can not be processed." % str(address))
-
-                elif result == INVALID:
-                    self.log.LOG(LOG_INFO, "sms.lookForConnection()", "Unknow client attempted to send a command, but the package was dropped.")
-
-                client_channel.close()
-
-            except socket.error, emsg:
-                self.log.LOG(LOG_ERROR, "sms.lookForConnection()", "Failed to receive client message. Error: %s" % emsg)
-            continue
-
-    def processMessage (self, cmsg, client_channel):
+    def newRequisition(self, orig, destn, msg, oper, send, blow):
         """
-        Brief: Select client action package
-        Param: cmsg The cient message package
-        Return: OK if everything went right; INVALID if the client ID does not exist; ERROR if an error ocurred
+        Brief: Treat data and try to insert new register into the database.
+        Param: orig The name that identifies the origin;
+        Param: destn The destinations of the requisition;
+        Param: msg The message content;
+        Param: oper The preferred operator to be used;
+        Param: send If the requisition is to be sent as fast as possible;
+        Param: blow When the requisition will be sent.
+        Return: OK(0) if could register the requisition; ERROR(-1) otherwise.
         """
-        CID = self.shared.splitTag(cmsg, TAG_ID)
-        
-        if CID == ERROR:
-            self.log.LOG(LOG_ERROR, "sms.processMessage()", "Failed to retrieve client ID from received message.")
+        try:
+            data_dict = {DATA_ORIG: orig,\
+                         DATA_DESTN: destn,\
+                         DATA_MSG: msg,\
+                         DATA_OPER: oper,\
+                         DATA_SEND: send,\
+                         DATA_BLOW: blow}
+
+            if self.dbcom.registerRequisition(data_dict) == OK:
+                self.log.LOG(LOG_INFO, "system", "New requisition from RPC was registered.")
+                return OK
+
+            else:
+                self.log.LOG(LOG_ERROR, "system.newRequisition()", "Failed to insert new requisition from RPC.")
+                return ERROR
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "system.newRequisition()", "Failed to insert new requisition from RPC connection. %s: %s" % (exc.__class__.__name__, exc))
             return ERROR
+
+    def systemHalt(self):
+        """
+        Brief: Halt the system.
+        """
+        self.log.LOG(LOG_INFO, "system", "Halting system due RPC requisition.")
+        exit(0)
+
+    def startXMLRPCServer(self):
+        """
+        Brief: Start to listening connections into the self.xmlrpc_server.
+        Return: None.
+        """
+        try:
+            self.log.LOG(LOG_INFO, "system.start()", "XML-RPC Server started binded into %s:%d" % (self.address, self.port))
+            self.xmlrpc_server.serve_forever()
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "system.start.startXMLRPXServer()", "Failed to start XML-RPC Server. %s: %s. Halting..." % (exc.__class__.__name__, exc))
+            exit(-1)
         
-        if CID == WEB:
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from WEB client was received.")
-            self.doWebAction(cmsg, client_channel)
-            return OK
-        
-        elif CID == ASTERISK:
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ASTERISK client was received.")
-            return OK
-        
-        elif CID == ALARMS:
-            self.doAlarmAction(cmsg, client_channel)
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from ALARMS client was received.")
-            return OK
-        
-        elif CID == MANAGER:
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Message from MANAGER was received.")    
-            self.doManagerAction(cmsg)
-        
-        else:
-            self.log.LOG(LOG_INFO, "sms.processMessage()", "Received message has an invalid ID: %d" % CID)
-            return INVALID
 
 #---------------------------------------------------------#
 #             System bootstrap                            #
 #---------------------------------------------------------#
 if __name__ == "__main__":
 
-    bind_address = "127.0.0.1"
-    bind_port = 3435
+    bind_address = "192.168.0.105"
+    bind_port = SYSTEM_PORT
     system = trigger(bind_address, bind_port, GSM_ATCOM)
     system.start()
 #---------------------------------------------------------#

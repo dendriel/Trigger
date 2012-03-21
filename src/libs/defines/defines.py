@@ -91,7 +91,8 @@ SEPARATOR_CHAR = '@'
 SEPARATOR_CHAR_FOR_DB = ','
 MAX_ORIG_LEN = 7       # Maximum string length to identify the origin            #
 MAX_DEST_CODE_LEN = 7   # Maximum string length to identify the destination group #
-MODULE_PORT = "/dev/ttyACM1"
+MODULE_PORT = "/dev/ttyACM0"
+RPC_PATHS = ('/RPC2')
 
 
 # AT RETURN VALUES #
