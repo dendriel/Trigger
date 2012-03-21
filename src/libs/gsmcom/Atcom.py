@@ -7,7 +7,8 @@ from libs.log.slog import slog
 # TODO Remove all the magic numbers and make macros #
 #     from the strings parameters. PLEASE!! I can't #
 #     live with that...                             #
-TIME_BETWEEN_AT = 0.2
+TIME_BETWEEN_AT = 0.2 # seconds #
+SEND_SMS_DELAY = 20  # seconds #
 
 class Atcom:
 
@@ -120,7 +121,8 @@ class Atcom:
         # Put the modem in SMS text mode #
         self._send("AT+CMGF=1")
         self._read() # AT+CMGF? -> +CMGF: 1 #
-        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"")
+        # Preferred Message Storage #
+        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"") # validate the answer bellow #
         self._read() # AT+CPMS? -> +CPMS: "SM",0,50,"SM",0,50,"SM",0,50 #
 
         self._close_port()
@@ -147,17 +149,14 @@ class Atcom:
         # Confirm the command #
         self._send("\032")
 
-        sleep(1)
+        sleep(SEND_SMS_DELAY)
         answer = self._read()
         self._close_port()
 
         # TODO this verification does not really work
-        if answer.find(AT_ERROR_ST) >= OK:
-            self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. Answer Content: %s" % answer)
-            return INVALID
-
-        self.log.LOG(LOG_INFO, "gsmcom.sendSMS()", "Message sent. Answer Content: %s" % answer)
-
+        #if answer.find(AT_ERROR_ST) >= OK:
+        #    self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. Answer Content: %s" % answer)
+        #    return INVALID
         return OK
 
     def getAllNewMessages(self):
@@ -184,21 +183,29 @@ class Atcom:
         if self._open_port() == ERROR:
             return ERROR
 
-        self._read()
-        self._send("AT+CPMS?")
-        answer = self._read() # 'at+cpms?\r+CPMS: "SM",3,50,"SM",3,50,"SM",3,50\r\n0\r' #
-
-        # handle the answer #
-        answer = answer.split() # ['at+cpms?', '+CPMS:', '"SM",3,50,"SM",3,50,"SM",3,50', '0'] #
-        answer = answer[2].split(",") # ['"SM"', '3', '50', '"SM"', '3', '50', '"SM"', '3', '50'] #
+        ANSWER_EXPECTED_FIELDS = 9
 
         try:
+            self._read()
+            self._send("AT+CPMS?")
+            answer = self._read() # 'at+cpms?\r+CPMS: "SM",3,50,"SM",3,50,"SM",3,50\r\n0\r' #
+
+            # handle the answer #
+            answer = answer.split() # ['at+cpms?', '+CPMS:', '"SM",3,50,"SM",3,50,"SM",3,50', '0'] #
+            answer = answer[2].split(",") # ['"SM"', '3', '50', '"SM"', '3', '50', '"SM"', '3', '50'] #
+
+            if len(answer) != ANSWER_EXPECTED_FIELDS: 
+                self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "Unexpected length in +CPMS answer. Expected: %d; Receive: %d" % (ANSWER_EXPECTED_FIELDS, len(answer)))
+                self._close_port()
+                return ERROR
+
             # ensures that the correct column will be returned #
             for index in range(len(answer)):
                 if answer[index] == '"SM"':
                     return int(answer[index+1])
 
         except Exception, exc:
+            self._close_port()
             self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
@@ -217,10 +224,9 @@ class Atcom:
         SMS_HEADER_FIELDS = 5 # header + command status (OK/ERROR)
         SMS_MSG_OFFSET = 4
 
-        self._read()
-        self._send("AT+CMGR=%d" % msg_index)
-
         try:
+            self._read()
+            self._send("AT+CMGR=%d" % msg_index)
             answer = self._read()
             answer = answer.split() # ['at+cmgr=1', '+CMGR:', '"REC', 'UNREAD","04896710721",,"12/03/15,12:34:20-12"', 'vitor:', 'dosiajdadada', '0'] #
             answer_sub = answer[3].split(",") # ['UNREAD"', '"04896710721"', '', '"12/03/15', '12:34:20-12"'] #
@@ -231,12 +237,29 @@ class Atcom:
 
             for count in range(msg_blocks):
                 msg += answer[SMS_MSG_OFFSET+count] # vitor:dosiajdadada #
+                if count < msg_blocks: # put spaces between the content, except in the last block. #
+                    msg += " "
 
-            sms_dict = {DATA_ORIG:orig, DATA_DATE:date, DATA_MSG:msg}
             self._close_port()
-            return sms_dict
+            return  {DATA_ORIG:orig, DATA_DATE:date, DATA_MSG:msg}
 
         except Exception, exc:
-            self.log.LOG(LOG_ERROR, "gsmcom.getMessagesCount()", "%s: %s" % (exc.__class__.__name__, exc))
+            self.log.LOG(LOG_ERROR, "gsmcom.getMessageByIndex()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+    def deleteMessage(self, msg_index):
+        """
+        Brief: Delete message by its index.
+        Return: OK if could delete the message;
+                ERROR otherwise.
+        """
+        if self._open_port() == ERROR:
+            return ERROR
+
+        self._send("AT+CMGD=%d" % msg_index)
+        answer = self._read()
+
+        # TODO validate answer #
+
+        self._close_port()
+        return OK

@@ -91,11 +91,7 @@ function validateForm()
     var time = document.sms_service.time;
     var sms_action = valButton(sms_service.sms_action);
 
-    if (isDate(date.value) == false) {
-        date.focus()
-        return false;
-
-    } else if (selectAllOptions('destination_users_select') == false) {
+    if (selectAllOptions('destination_users_select') == false) {
         alert('No destinations are selected!');
         return false;
 
@@ -103,11 +99,16 @@ function validateForm()
         alert('You need to add some text to the body message!');
         return false;
 
+    // if sms action is schedule, we need date/time parameters //
     } else if (sms_action == 1) {
 
-        if (isValidTime(time.value) == false) {
-            time.focus();
+        if (isDate(date.value) == false) {
+            date.focus()
             return false;
+    
+        } else if (isValidTime(time.value) == false) {
+                time.focus();
+                return false;
         }
     
     } else {

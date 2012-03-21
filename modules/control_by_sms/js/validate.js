@@ -44,13 +44,17 @@ function DaysArray(n) {
 }
 
 function isDate(dtStr){
+
     var daysInMonth = DaysArray(12)
     var pos1=dtStr.indexOf(dtCh)
     var pos2=dtStr.indexOf(dtCh,pos1+1)
-    var strMonth=dtStr.substring(0,pos1)
-    var strDay=dtStr.substring(pos1+1,pos2)
+    var strDay=dtStr.substring(0,pos1)
+    var strMonth=dtStr.substring(pos1+1,pos2)
+//    var strMonth=dtStr.substring(0,pos1)
+//    var strDay=dtStr.substring(pos1+1,pos2)
     var strYear=dtStr.substring(pos2+1)
     strYr=strYear
+
     if (strDay.charAt(0)=="0" && strDay.length>1) strDay=strDay.substring(1)
     if (strMonth.charAt(0)=="0" && strMonth.length>1) strMonth=strMonth.substring(1)
     for (var i = 1; i <= 3; i++) {
@@ -60,7 +64,7 @@ function isDate(dtStr){
     day=parseInt(strDay)
     year=parseInt(strYr)
     if (pos1==-1 || pos2==-1){
-        alert("The date format should be : mm/dd/yyyy")
+        alert("The date format should be : dd/mm/yyyy")
         return false
     }
     if (strMonth.length<1 || month<1 || month>12){
@@ -108,7 +112,8 @@ function isValidTime(timeStr)
 {
 // Checks if time is in HH:MM:SS AM/PM format.
 // The seconds and AM/PM are optional.
-    var timePat = /^(\d{1,2}):(\d{2})(:(\d{2}))?(\s?(AM|am|PM|pm))?$/;
+    var timePat = /^(\d{1,2}):(\d{2})?$/;
+    //var timePat = /^(\d{1,2}):(\d{2})(:(\d{2}))?(\s?(AM|am|PM|pm))?$/;
     
     var matchArray = timeStr.match(timePat);
 
@@ -118,17 +123,19 @@ function isValidTime(timeStr)
     }
     hour = matchArray[1];
     minute = matchArray[2];
-    second = matchArray[4];
-    ampm = matchArray[6];
+    second = "00";
+    //second = matchArray[4];
+    ampm = null;
+    //ampm = matchArray[6];
     
     if (second=="") { second = null; }
     if (ampm=="") { ampm = null }
     
     if (hour < 0  || hour > 23) {
-        alert("Hour must be between 1 and 12. (or 0 and 23 for military time)");
+        alert("Hour must be between 0 and 23.");
         return false;
     }
-    if (hour <= 12 && ampm == null) {
+/*    if (hour <= 12 && ampm == null) {
         if (confirm("Please indicate which time format you are using.  OK = Standard Time, CANCEL = Military Time")) {
             alert("You must specify AM or PM.");
             return false;
@@ -138,15 +145,16 @@ function isValidTime(timeStr)
         alert("You can't specify AM or PM for military time.");
         return false;
     }
+*/
     if (minute<0 || minute > 59) {
         alert ("Minute must be between 0 and 59.");
         return false;
     }
-    if (second != null && (second < 0 || second > 59)) {
+/*    if (second != null && (second < 0 || second > 59)) {
         alert ("Second must be between 0 and 59.");
     return false;
     }
-
+*/
     return true;
 }
 //  End -->

@@ -1,5 +1,4 @@
 #coding=utf8
-from mx.DateTime import DateTime
 from datetime import datetime
 from libs.defines.defines import *
 
@@ -108,10 +107,10 @@ class shared:
 		except:
 			return ERROR
 ##
-# Brief: Mount a mxDateTime object from a string.
+# Brief: Mount a DateTime object from a string.
 # Param: time_str The string that have the content
 #	to mount the time object.
-# Return: The mxDateTime object; NOTFOUND if some
+# Return: The DateTime object; NOTFOUND if some
 #	content are missing; ERROR if something
 #	goes wrong.
 # Note: the parameter time_str must be in the

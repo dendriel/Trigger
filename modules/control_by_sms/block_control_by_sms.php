@@ -39,8 +39,8 @@ class block_control_by_sms extends block_base {
         // Third Service //
     	$schedule_sms.= '<tr>';
     	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: send_sms()">';
-        $schedule_sms.= 'Options';
+    	$schedule_sms.= '<a href="javascript: configure_feature()">';
+        $schedule_sms.= 'Configure';
         $schedule_sms.= '</a></b></div>';
   	$schedule_sms.= '</tr>';
     
@@ -66,14 +66,25 @@ class block_control_by_sms extends block_base {
     public function specialization() 
     {
     	global $COURSE;
+        global $USER;
+
     	$course_id = $COURSE->id;
+        $user_id = $USER->id;
     
     	$js.= "<script type=\"text/javascript\">\n";
+
     	$js.= "function schedule_sms() {\n";
-    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=' + $course_id + '&var1=2' + '&var2=3','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n}\n";
+    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=' + $course_id + '&user_id=' + $user_id,'','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
+        $js.=  "}\n";
+
     	$js.= "function send_sms() {\n";
-    	$js.= "var course_id = $course_id;\n";
-    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n}\n";
+    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
+        $js.= "}\n";
+
+        $js.= "function configure_feature() {\n";
+        $js.= "var load = window.open('/moodle/blocks/control_by_sms/configure_sms.php','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
+        $js.= "}\n";
+
     	$js.= "</script>\n";
     
     	echo $js;
