@@ -93,3 +93,8 @@ JavaScript:
 
  Radio:
  http://javascript.about.com/library/blradio.htm
+
+----------------------------------------------+
+XML-RPC
+
+ http://www.tldp.org/HOWTO/XML-RPC-HOWTO/xmlrpc-howto-php.html
