@@ -116,9 +116,13 @@ class Pgcom:
             return ERROR
 
     def getRequisitions(self, status):
-
+        """
+        Brief: Ask database by a list of the specified requisition status.
+        Param: status The status for searching for the requisitions.
+        Return: An list with the ocurrence of the specified requisition status.
+        """
         if self.__connect() == OK:
-            query = "SELECT %s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, TABLE_SMS, status)
+            query = "SELECT %s,%s,%s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, DATA_ORIG, DATA_MSG, TABLE_SMS, status)
             ret = self.__query(query)
             self.__disconnect()
             return ret
@@ -127,7 +131,13 @@ class Pgcom:
             return ERROR
 
     def changeRequisitionStatus(self, req_id, status):
-
+        """
+        Brief: Change a requisition status in database.
+        Param: req_id The requisition to be modified.
+        Param: status The new status for the requisition.
+        Return: OK if could change the requisition status;
+                ERROR if something whent wrong.
+        """
         if self.__connect() == OK:
             query = "UPDATE %s SET %s=%d WHERE %s=%d" % (TABLE_SMS, DATA_STATUS, status, DATA_ID, req_id)
             ret = self.__query(query)

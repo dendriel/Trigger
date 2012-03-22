@@ -1,5 +1,4 @@
 <?
-
 Class Postgrescom {
 
 	protected $host = "localhost";

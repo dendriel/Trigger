@@ -17,6 +17,8 @@ GIT:
 ----------------------------------------------+
 PYTHON:
  
+ http://docs.python.org/library/subprocess.html#module-subprocess
+
  Python-MySQL:
  http://www.kitebird.com/articles/pydbapi.html
  http://mysql-python.sourceforge.net/MySQLdb-1.2.2/public/MySQLdb.cursors-module.html
@@ -98,3 +100,9 @@ JavaScript:
 XML-RPC
 
  http://www.tldp.org/HOWTO/XML-RPC-HOWTO/xmlrpc-howto-php.html
+
+----------------------------------------------+
+Moodle
+
+ Searching specific "level users"
+ http://docs.moodle.org/dev/Roles#The_new_roles_and_capability_system

@@ -94,6 +94,12 @@ MAX_DEST_CODE_LEN = 7   # Maximum string length to identify the destination grou
 MODULE_PORT = "/dev/ttyACM0"
 RPC_PATHS = ('/RPC2')
 
+# Validator Parameters #
+VALIDATOR_PATH = "../valitate_number/validator.php" # not really defined yet... #
+VAL_NUMB_EXIST    = 0     # The validated number exist in database and is from a teacher #
+VAL_NUMB_MISSING  = 1     # The validated number does not exist for a teacher            #
+VAL_PROC_ERROR      = 2     # The validator failed to process the number                   #
+
 
 # AT RETURN VALUES #
 AT_OK = "0"

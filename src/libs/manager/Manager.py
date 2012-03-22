@@ -1,6 +1,6 @@
 # -*-coding:utf-8-*-
-import socket
 import time
+import subprocess
 from threading import Thread
 from datetime import datetime
 from libs.defines.defines import *
@@ -15,7 +15,10 @@ SEND = 2
 class Manager:
 
     def __init__(self, log_obj, gsmcom):
-
+        """
+        Param: log_obj A slog object to use to log infos.
+        Param: gsmcom A gsmcommunication to use SMS service.
+        """
         self.log = log_obj
         self.monitor_thread = ''
         self.dbcom = Pgcom(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, self.log)
@@ -175,12 +178,20 @@ class Manager:
                 INVALID if the requisition could not be understood.
                 ERROR otherwise.
         """
-        # TODO - Create the script to validate origin and retrieve destination list #
-        if self.validateOrigin(msg_data[DATA_ORIG]) == ERROR:
+        # Create the script to validate origin and retrieve destination list #
+        #ret = self.validateOrigin(msg_data[DATA_ORIG])
+        ret = OK # Remove this line and uncomment line above; its for testing purpose #
+        if ret == INVALID:
+            return INVALID
+
+        elif ret == ERROR:
+            self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred while validating requisition from gsm module.")
             return ERROR
 
         msg_values = self.getValuesFromMessage(msg_data[DATA_MSG])
+
         if msg_values == ERROR:
+            self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
         # dest_list -> needs to retrieve specified group cellphone address
@@ -244,7 +255,7 @@ class Manager:
             # TODO try to recover a date/time value; if was not possible, add the field to the message
             
         except Exception, exc:
-            self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "%s: %s" % (exc.__class__.__name__, exc))
+            self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Error while mounting dictionary. %s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
     def validateOrigin(self, number):
@@ -254,7 +265,21 @@ class Manager:
         Return: OK if the number is trusted; INVALID if the number does not
                 exist; ERROR if something went wrong
         """
-        return OK
+        try:
+            valitation_val = subprocess.Popen([VALIDATOR_PATH, number]);
+
+            if validation_val == VAL_NUM_EXIST:
+                return OK
+    
+            elif validation_val == VAL_NUM_MISSING:
+                return INVALID
+    
+            else:
+                return ERROR
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "manager.validateOrigin()", "Error while validating origin from requisition. %s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
 
     def retrieveDateTime(self, dt_data):
         """

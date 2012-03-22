@@ -115,7 +115,8 @@ class trigger:
         try:
             self.xmlrpc_server = SimpleXMLRPCServer((self.address, self.port))
             self.xmlrpc_server.register_function(self.newRequisition)
-            self.xmlrpc_server.register_function(self.systemHalt)
+            self.xmlrpc_server.register_function(self.getRequisitions)
+            #self.xmlrpc_server.register_function(self.systemHalt)
             self.xmlrpc_server.register_introspection_functions()
             self.log.LOG(LOG_INFO, "system.start()", "XML-RPC Server configured.")
             return
@@ -155,12 +156,23 @@ class trigger:
             self.log.LOG(LOG_ERROR, "system.newRequisition()", "Failed to insert new requisition from RPC connection. %s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+    def getRequisitions(self, status):
+        """
+        Brief: Ask database by a list of the specified requisition status.
+        Param: status The status for searching for the requisitions.
+        Return: An list with the ocurrence of the specified requisition status.
+        """
+        req_list = self.dbcom.getRequisitions(status)
+        return req_list
+
     def systemHalt(self):
         """
         Brief: Halt the system.
         """
         self.log.LOG(LOG_INFO, "system", "Halting system due RPC requisition.")
-        exit(0)
+        # TODO does not work... yet. #
+        #exit(0)
+        return OK
 
     def startXMLRPCServer(self):
         """
