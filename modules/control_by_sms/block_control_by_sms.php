@@ -28,14 +28,6 @@ class block_control_by_sms extends block_base {
         $schedule_sms.= '</a></b></div>';
     	$schedule_sms.= '</tr>';
     
-    	// Second Service //
-    	$schedule_sms.= '<tr>';
-    	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: send_sms()">';
-    	$schedule_sms.= get_string('send_sms', 'block_control_by_sms');
-        $schedule_sms.= '</a></b></div>';
-  	$schedule_sms.= '</tr>';
-    
         // Third Service //
     	$schedule_sms.= '<tr>';
     	$schedule_sms.= '<div style="text-align:center;"><b>';
@@ -47,7 +39,7 @@ class block_control_by_sms extends block_base {
         // Fourth Service //
     	$schedule_sms.= '<tr>';
     	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: send_sms()">';
+    	$schedule_sms.= '<a href="javascript: open_reports()">';
         $schedule_sms.= 'Reports';
         $schedule_sms.= '</a></b></div>';
   	$schedule_sms.= '</tr>';
@@ -70,19 +62,21 @@ class block_control_by_sms extends block_base {
 
     	$course_id = $COURSE->id;
         $user_id = $USER->id;
+
+        $req_type = 0; //TODO find a way to get variables from ./php/defines,php and use the $ACTIVE macro.
     
     	$js.= "<script type=\"text/javascript\">\n";
 
     	$js.= "function schedule_sms() {\n";
-    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=' + $course_id + '&user_id=' + $user_id,'','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=$course_id&user_id=$user_id','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.=  "}\n";
 
-    	$js.= "function send_sms() {\n";
-    	$js.= "var load = window.open('/moodle/blocks/control_by_sms/schedule_sms.php','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
+        $js.= "function configure_feature() {\n";
+        $js.= "window.open('/moodle/blocks/control_by_sms/configure_sms.php','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.= "}\n";
 
-        $js.= "function configure_feature() {\n";
-        $js.= "var load = window.open('/moodle/blocks/control_by_sms/configure_sms.php','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
+    	$js.= "function open_reports() {\n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.= "}\n";
 
     	$js.= "</script>\n";
@@ -90,19 +84,4 @@ class block_control_by_sms extends block_base {
     	echo $js;
 
     }
-	
-/********************************/
-/*      Private Functions 	*/
-/********************************/
-
-//	private function ping_daemon() {
-
-//		if (empty($this->config->daemon_address)) {
-			//$this->config->daemon_address = "127.0.0.1";
-//		}
-//		if (empty($this->config->daemon_port)) {
-//			$this->config->daemon_port = 3435;
-//		}
-
-//	}
 } 

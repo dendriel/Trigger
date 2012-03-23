@@ -2,11 +2,7 @@
 include('./php/interface.php');
 include('./php/libs/Postgrescom.class.php');
 include('./php/libs/IXR_Library.inc.php');
-
-$DAEMON_ADDRESS = "192.168.0.105";
-$DAEMON_PORT = 3435;
-$OPERATOR = 0;
-$TRUE = 0;
+include('./php/defines.php');
 
 $con = new Postgrescom();
 
@@ -108,20 +104,18 @@ if ($_GET != null) {
 
     // retrive date/time //
     if ($send == 1) {
-        $datetime = $_GET['date'] . ' ' . $_GET['time'];
+        $datetime = $_GET['date'] . ' ' . $_GET['time'] . ':00';
         $send = False;
 
     } else {
-       $datetime = "10/10/2012 20:30:30"; 
+        $datetime = "10/10/2012 20:30:30"; 
         $send = True;
     }
 
     // submit all //
     //echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts;
 
-    $server_address = 'http://' . $DAEMON_ADDRESS . ':' . $DAEMON_PORT . '/RPC2';
-
-    if (($origin_ts != null) and ($contacts_list != null) and ($message != null) and ($send != null)) {
+    if (($origin_ts != null) and ($contacts_list != null) and ($message != null)) {
         try {
             $client = new IXR_Client($server_address);
             
