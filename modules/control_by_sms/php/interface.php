@@ -47,7 +47,7 @@ function build_empty_table()
 function build_header()
 {
     $header.= "<html><head>";
-    $header.= "<title>Control by SMS</title>";
+    $header.= "<title>Control by SMS - Schedule</title>";
     $header.= "<script src=\"./js/interface.js\"></script>";
     $header.= "<script src=\"./js/validate.js\"></script>"; 
     $header.= "</head><body>";

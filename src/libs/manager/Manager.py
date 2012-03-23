@@ -44,9 +44,9 @@ class Manager:
         """
         while(True):
 
-            self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
+            #self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
             self.sendService()
-            self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
+            #self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
             self.receiveService()
             time.sleep(MNGR_THRD_SLEEP)
 
@@ -108,9 +108,11 @@ class Manager:
 
         for destination in data_dict[DATA_DESTN]:
             ret = OK 
-            self.log.LOG(content=destination)
+
             if self.gsmcom.sendSMS(destination, message) != OK:
                 ret = ERROR
+
+            self.log.LOG(LOG_INFO, "manager", "SMS sent to destination: %s" % destination)
                 
 
         if ret == OK:

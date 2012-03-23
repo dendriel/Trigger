@@ -122,7 +122,7 @@ class Pgcom:
         Return: An list with the ocurrence of the specified requisition status.
         """
         if self.__connect() == OK:
-            query = "SELECT %s,%s,%s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, DATA_ORIG, DATA_MSG, TABLE_SMS, status)
+            query = "SELECT %s,%s,%s,%s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, DATA_ORIG, DATA_MSG, DATA_DESTN, TABLE_SMS, status)
             ret = self.__query(query)
             self.__disconnect()
             return ret
@@ -234,9 +234,9 @@ class Pgcom:
 
             if table_type == TABLE_SMS:
                 query = "CREATE TABLE %s (\
-                     %s CHAR(7),\
-                     %s CHAR(449),\
-                     %s CHAR(150),\
+                     %s CHARACTER VARYING(7),\
+                     %s CHARACTER VARYING(449),\
+                     %s CHARACTER VARYING(150),\
                      %s INT,\
                      %s BOOLEAN,\
                      %s TIMESTAMP,\

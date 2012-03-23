@@ -12,5 +12,4 @@
 	$string['labelallowhtml'] = "Sei la ";
 	$string['descallowhtml'] = "Sei la ";
 
- $string['schedule_sms'] = "Schedule SMS";
- $string['send_sms'] = "Send SMS";
+ $string['schedule_sms'] = "Schedule";
