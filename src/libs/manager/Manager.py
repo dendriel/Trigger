@@ -196,8 +196,7 @@ class Manager:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
-        # dest_list -> needs to retrieve specified group cellphone address
-        dest_list = "91553900,91553900,91553900"
+        dest_list = getDestinations(msg_values[DATA_DESTN])# dest_list -> needs to retrieve specified group cellphone address
 
         try:
             req_dict = {
@@ -247,7 +246,7 @@ class Manager:
                     if index < len_values:
                         msg+= " " # put spaces between text words #
                 
-                return {DATA_ORIG:orig, DATA_MSG:msg, DATA_SEND:date_time[DATA_SEND], DATA_BLOW:str(date_time[DATA_BLOW])}
+                return {DATA_ORIG:orig, DATA_MSG:msg, DATA_SEND:date_time[DATA_SEND], DATA_BLOW:str(date_time[DATA_BLOW]), DATA_DESTN:dest_code}
 
             else:
                 self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Message body is not correctly formated. Values Length: %d" % len(values))
@@ -260,6 +259,29 @@ class Manager:
             self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Error while mounting dictionary. %s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+    def getDestinations(self, dest_code):
+        """
+        Brief: Call a script to retrieve data destinations by a give group.
+        Param: dest_code The code that represents the group to be searched.
+        Return: A string with the recovered destination phones.
+        """
+        try:
+            val = subprocess.Popen([INTERPRETER, GET_NUMBER_PATH, dest_code])
+            destn = val.wait()
+
+            if destn == VAL_NUM_MISSING:
+                return INVALID
+
+            elif destn == VAL_PRO_ERROR:
+                return ERROR
+
+            else:
+                return destn
+
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "manager.getDestinations()", "Error while executing \"get_contacts.php\" script. %s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
+
     def validateOrigin(self, number):
         """
         Brief: Call a extern script that will validate the given number.
@@ -268,7 +290,8 @@ class Manager:
                 exist; ERROR if something went wrong
         """
         try:
-            valitation_val = subprocess.Popen([VALIDATOR_PATH, number]);
+            val = subprocess.Popen([INTERPRETER, VALIDATOR_PATH, number]);
+            validation_val = val.wait()
 
             if validation_val == VAL_NUM_EXIST:
                 return OK

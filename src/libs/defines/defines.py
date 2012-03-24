@@ -95,10 +95,12 @@ MODULE_PORT = "/dev/ttyACM0"
 RPC_PATHS = ('/RPC2')
 
 # Validator Parameters #
-VALIDATOR_PATH = "../valitate_number/validator.php" # not really defined yet... #
+VALIDATOR_PATH    = "../daemon_modules/validator.php" # not really defined yet... #
+GET_NUMBER_PATH   = "../daemon_modules/get_contacts.php" # not really defined yet... #
 VAL_NUMB_EXIST    = 0     # The validated number exist in database and is from a teacher #
 VAL_NUMB_MISSING  = 1     # The validated number does not exist for a teacher            #
-VAL_PROC_ERROR      = 2     # The validator failed to process the number                   #
+VAL_PROC_ERROR    = 2     # The validator failed to process the number                   #
+INTERPRETER       = "php" # what interpreter will run the "modular scripts" #
 
 
 # AT RETURN VALUES #

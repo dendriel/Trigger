@@ -116,6 +116,7 @@ class trigger:
             self.xmlrpc_server = SimpleXMLRPCServer((self.address, self.port))
             self.xmlrpc_server.register_function(self.newRequisition)
             self.xmlrpc_server.register_function(self.getRequisitions)
+            self.xmlrpc_server.register_function(self.pingDaemon)
             #self.xmlrpc_server.register_function(self.systemHalt)
             self.xmlrpc_server.register_introspection_functions()
             self.log.LOG(LOG_INFO, "system.start()", "XML-RPC Server configured.")
@@ -164,6 +165,13 @@ class trigger:
         """
         req_list = self.dbcom.getRequisitions(status)
         return req_list
+
+    def pingDaemon(self):
+        """
+        Brief: To look after daemon status.
+        Return: OK(0).
+        """
+        return OK
 
     def systemHalt(self):
         """

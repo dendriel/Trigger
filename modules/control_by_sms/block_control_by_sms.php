@@ -14,43 +14,38 @@ class block_control_by_sms extends block_base {
     	}
     		
     	$this->content = new stdClass;
-    
-    	// Header //
-        $header = "<html><body>";
-    	$schedule_sms.= '<html><body>';
-    	$schedule_sms.= '<table>';
-    
-    	// First Service //
-    	$schedule_sms.= '<tr>';
-    	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: schedule_sms()">';
-    	$schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
+
+        $content.= "<html><body>";
+
+        $schedule_sms.= '<table>';
+        // Schedule //
+        $schedule_sms.= '<tr>';
+        $schedule_sms.= '<div style="text-align:center;"><b>';
+        $schedule_sms.= '<a href="javascript: schedule_sms()">';
+        $schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
         $schedule_sms.= '</a></b></div>';
-    	$schedule_sms.= '</tr>';
-    
-        // Third Service //
-    	$schedule_sms.= '<tr>';
-    	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: configure_feature()">';
+        $schedule_sms.= '</tr>';
+        // Configure //   
+        $schedule_sms.= '<tr>';
+        $schedule_sms.= '<div style="text-align:center;"><b>';
+        $schedule_sms.= '<a href="javascript: configure_feature()">';
         $schedule_sms.= 'Configure';
         $schedule_sms.= '</a></b></div>';
-  	$schedule_sms.= '</tr>';
-    
-        // Fourth Service //
-    	$schedule_sms.= '<tr>';
-    	$schedule_sms.= '<div style="text-align:center;"><b>';
-    	$schedule_sms.= '<a href="javascript: open_reports()">';
+        $schedule_sms.= '</tr>';
+        // Reports //
+        $schedule_sms.= '<tr>';
+        $schedule_sms.= '<div style="text-align:center;"><b>';
+        $schedule_sms.= '<a href="javascript: open_reports()">';
         $schedule_sms.= 'Reports';
         $schedule_sms.= '</a></b></div>';
-  	$schedule_sms.= '</tr>';
+        $schedule_sms.= '</tr>';
+        $schedule_sms.= '</table>';
 
-    	$schedule_sms.= '</table>';
-    
-    	// Tail //
-        $schedule_sms.= "</body></html>";
-    
-    	$this->content->text   = $schedule_sms;
-    	$this->content->footer = 'Developed by Rozsa';
+        $content.= $schedule_sms;
+        $content.= '</body></html>';
+
+    	$this->content->text   = $content;
+    	$this->content->footer = "whatever";
     	
     	return $this->content;
     }
