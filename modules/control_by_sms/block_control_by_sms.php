@@ -6,46 +6,64 @@ class block_control_by_sms extends block_base {
     {
     	$this->title = get_string('control_by_sms', 'block_control_by_sms');
     }
+
+    function has_config() {
+        return true;
+    }
     
     public function get_content() 
     {
     	if ($this->content !== null) {
             return $this->content;
     	}
-    		
+
     	$this->content = new stdClass;
+        $open_to_use = get_config('control_by_sms', 'Open_to_use');
+        global $USER;
 
         $content.= "<html><body>";
 
         $schedule_sms.= '<table>';
-        // Schedule //
-        $schedule_sms.= '<tr>';
-        $schedule_sms.= '<div style="text-align:center;"><b>';
-        $schedule_sms.= '<a href="javascript: schedule_sms()">';
-        $schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
-        $schedule_sms.= '</a></b></div>';
-        $schedule_sms.= '</tr>';
-        // Configure //   
-        $schedule_sms.= '<tr>';
-        $schedule_sms.= '<div style="text-align:center;"><b>';
-        $schedule_sms.= '<a href="javascript: configure_feature()">';
-        $schedule_sms.= 'Configure';
-        $schedule_sms.= '</a></b></div>';
-        $schedule_sms.= '</tr>';
-        // Reports //
-        $schedule_sms.= '<tr>';
-        $schedule_sms.= '<div style="text-align:center;"><b>';
-        $schedule_sms.= '<a href="javascript: open_reports()">';
-        $schedule_sms.= 'Reports';
-        $schedule_sms.= '</a></b></div>';
-        $schedule_sms.= '</tr>';
-        $schedule_sms.= '</table>';
 
+        if($open_to_use) {
+            // Schedule //
+            $schedule_sms.= '<tr>';
+            $schedule_sms.= '<div style="text-align:center;"><b>';
+            $schedule_sms.= '<a href="javascript: schedule_sms()">';
+            $schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
+            $schedule_sms.= '</a></b></div>';
+            $schedule_sms.= '</tr>';
+            // Reports //
+            $schedule_sms.= '<tr>';
+            $schedule_sms.= '<div style="text-align:center;"><b>';
+            $schedule_sms.= '<a href="javascript: open_reports()">';
+            $schedule_sms.= 'Reports';
+            $schedule_sms.= '</a></b></div>';
+            $schedule_sms.= '</tr>';
+    
+            // Configure //   
+/*            $schedule_sms.= '<tr>';
+            $schedule_sms.= '<div style="text-align:center;"><b>';
+            $schedule_sms.= '<a href="javascript: configure_feature()">';
+            $schedule_sms.= 'Configure';
+            $schedule_sms.= '</a></b></div>';
+            $schedule_sms.= '</tr>';
+*/
+        } else {
+            $schedule_sms.= '<tr>';
+            $schedule_sms.= '<div style="text-align:center;"><b>';
+            $schedule_sms.= '<a>';
+            $schedule_sms.= 'Service stopped. Contact the admin for more information.';
+            $schedule_sms.= '</a></b></div>';
+            $schedule_sms.= '</tr>';
+        }
+        #$schedule_sms.= print_object($USER);
+        $schedule_sms.= '</table>';
         $content.= $schedule_sms;
         $content.= '</body></html>';
 
     	$this->content->text   = $content;
-    	$this->content->footer = "whatever";
+    	$this->content->footer = "Developed By Vitor Rozsa";
     	
     	return $this->content;
     }

@@ -1,4 +1,5 @@
 <?php
+include('./php/libs/Postgrescom.class.php');
 include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
 include('./php/interface.php');
@@ -9,6 +10,36 @@ $failed_b = "Failed";
 $sent_b = "Sent";
 
 if ($_GET != null) {
+
+    $con = new Postgrescom();
+    
+    $con->open();
+    if($con->statusCon() == -1) {
+        echo "conexao falhou!";
+        exit;
+    }
+
+    $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
+
+    if ($answer == -1) {
+        echo "Error while communicating with the moodle database!";
+        exit;
+    } else {
+        $allowed = pg_fetch_all($answer);
+        $allowed_len = count($allowed);
+
+        $ok = false;   
+
+        for($index = 0; $index < $allowed_len; $index++) {
+            if((int)$user_id == (int)$allowed[$index]["userid"]) {
+                $ok = true;
+            }
+        }
+        if ($ok == false) {
+            echo "You don't have permission to use this feature!";
+            exit(0);
+        }
+    }
 
     $req_type = (int)$_GET['req_type'];
     $req_list = get_requisitions($req_type);

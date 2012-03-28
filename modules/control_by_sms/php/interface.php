@@ -78,7 +78,7 @@ function build_table_buttons()
  */
 function build_input_form($origin)
 {
-    $form.= "<table border=1>";
+    $form.= "<table>";
 
     $form.= "<tr><td>";
     $form.= "Origin:<input name=\"origin\" type=\"text\" value=\"$origin\" maxlength=7>";
@@ -106,6 +106,17 @@ function build_input_form($origin)
     $form.= "</td></tr>";
 
     $form.= "</table>";
+
+    return $form;
+}
+
+function build_select_group_input() 
+{
+    $form.= "<form method=\"get\" action=\"schedule_sms.php\">";
+    $form.= "Insert a destination group (by shortname):";
+    $form.= "<input name=\"course_group\" type=\"text\" maxlength=10>";
+    $form.= "<input type=\"submit\" value=\"Retrive students\">";
+    $form.= "</form>";
 
     return $form;
 }
