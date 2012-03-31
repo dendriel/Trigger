@@ -263,3 +263,4 @@ class Atcom:
 
         self._close_port()
         return OK
+

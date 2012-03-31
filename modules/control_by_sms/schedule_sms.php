@@ -12,18 +12,46 @@ if($con->statusCon() == -1) {
     exit;
 }
 
-$users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members)");
+if($_GET['course_group'] != "") {
 
-if ($users == -1) {
-    echo "Error while communicating with the moodle database!";
-    exit;
+    $group = $_GET['course_group'];
+    $users = $con->query("SELECT firstname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
+
+    if ($users == -1) {
+        echo "Error while communicating with the moodle database!";
+        exit;
+    }
 }
 
 $user_id = $_GET['user_id'];
 
+// Test if the user is allowed to use the feature //
 if ($user_id != null) {
-    $origin = $con->query("SELECT lastname FROM mdl_user WHERE id=$user_id");
 
+    $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
+
+    if ($answer == -1) {
+        echo "Error while communicating with the moodle database!";
+        exit;
+
+    } else {
+        $allowed = pg_fetch_all($answer);
+        $allowed_len = count($allowed);
+        $ok = false;   
+
+        for($index = 0; $index < $allowed_len; $index++) {
+            if((int)$user_id == (int)$allowed[$index]["userid"]) {
+                $ok = true;
+            }
+        }
+        if ($ok == false) {
+            echo "You don't have permission to use this feature!";
+            exit(0);
+        }
+    }
+    
+    // Select the lastname of the user to fill the origin field //
+    $origin = $con->query("SELECT lastname FROM mdl_user WHERE id=$user_id");
     if ($origin == -1) {
         echo "Error while communicating with the moodle database!";
         exit;
@@ -34,6 +62,7 @@ if ($user_id != null) {
 } 
 
 $header = build_header();
+$select_group = build_select_group_input();
 $contacts_table = build_contacts_table($users);
 $table_buttons = build_table_buttons();
 $selected_table = build_empty_table();
@@ -43,11 +72,25 @@ $tail = build_tail();
 
 $form.= $header;
 
-$form.= "<table>";
+$form.= "<table border=\"2\">";
 $form.= "<tr>";
 
 $form.= "<td>";
-$form.= $contacts_table;
+$form.= "<table border=\"1\">";
+
+    $form.= "<tr>";
+        $form.= "<td>";
+            $form.= $select_group;
+        $form.= "</td>";
+    $form.= "</tr>";
+
+    $form.= "<tr>";
+        $form.= "<td>";
+            $form.= $contacts_table;
+        $form.= "</td>";
+    $form.= "</tr>";
+
+$form.= "</table>";
 $form.= "</td>";
 
 $form.= "<td>";

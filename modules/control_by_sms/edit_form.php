@@ -8,14 +8,14 @@ class block_control_by_sms_edit_form extends block_edit_form {
 	        $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
 		// Daemon communication configurations.
-		$mform->addElement('static', 'description', get_string('daemon_configuration', 'block_control_by_sms'));
+		#$mform->addElement('static', 'description', get_string('daemon_configuration', 'block_control_by_sms'));
+	       # $mform->addElement('advcheckbox', 'config_open_to_use', get_string('allow_to_use', 'block_control_by_sms'));
+               #$mform->addElement('text', 'config_open_to_use', 'Text field (disabled default)');
+               # $mform->disabledIf('config_open_to_use', 'advcheck');
 
-	        $mform->addElement('text', 'config_daemon_address', get_string('address', 'block_control_by_sms'));
-	        $mform->setDefault('config_daemon_address', '127.0.0.1');
-	        $mform->setType('config_daemon_address', PARAM_MULTILANG);       
+                #$this->add_action_buttons(true);
 
-	        $mform->addElement('text', 'config_daemon_port', get_string('port', 'block_control_by_sms'));
-	        $mform->setDefault('config_daemon_port', '3435');
-	        $mform->setType('config_daemon_port', PARAM_MULTILANG);       
+
+
 	}
 }

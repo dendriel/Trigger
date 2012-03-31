@@ -6,6 +6,8 @@ $server_address = 'http://' . $DAEMON_ADDRESS . ':' . $DAEMON_PORT . '/RPC2';
 $OPERATOR = 0;
 $TRUE = 0;
 
+$PHONE2 = "phone2";
+
 // REQUISITION STATUS //
 $ACTIVE   = 0;
 $CANCELED = 1;
