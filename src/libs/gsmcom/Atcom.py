@@ -95,13 +95,13 @@ class Atcom:
 
         self._read()
         self._send("ATI")
-        ret = self._read()
+        ret = self._read() # ATI^M0^M #
         self._close_port()
-        # TODO do this thing more acurrate
-        if ret.find(AT_OK) <= ERROR:
-            return ERROR
-        else:
+
+        if ret.find(AT_OK) > ERROR:
             return OK
+        else:
+            return ERROR
 
     def info (self):
         """
@@ -115,18 +115,34 @@ class Atcom:
         Return: OK if the alarm was sent; ERROR in whatever
               other case.
         """
-        if self._open_port() == ERROR:
+        try:
+            CPMS_RESULT_POS = 3
+
+            if self._open_port() == ERROR:
+                return ERROR
+            #--------------------------------# 
+            # Put the modem in SMS text mode #
+            self._send("AT+CMGF=1")
+            ret = self._read() # AT+CMGF=1^M0^M #
+    
+            if ret.find(AT_OK) <= ERROR:
+                return ERROR
+            #---------------------------#
+            # Preferred Message Storage #
+            self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"") # validate the answer bellow #
+            ret = self._read() # AT+CPMS="SM","SM","SM"^M+CPMS: 0,50,0,50,0,50^M 0^M
+            ret = ret.split()[CPMS_RESULT_POS]
+    
+            if ret.find(AT_OK) <= ERROR:
+                return ERROR
+    
+            self._close_port()
+            return OK
+
+        except Exception, exc:
+            self._close_port()
+            self.log.LOG(LOG_ERROR, "gsmcom.configureModule()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
-
-        # Put the modem in SMS text mode #
-        self._send("AT+CMGF=1")
-        self._read() # AT+CMGF? -> +CMGF: 1 #
-        # Preferred Message Storage #
-        self._send("AT+CPMS=\"SM\",\"SM\",\"SM\"") # validate the answer bellow #
-        self._read() # AT+CPMS? -> +CPMS: "SM",0,50,"SM",0,50,"SM",0,50 #
-
-        self._close_port()
-        return OK
 
     def sendSMS(self, destination, content):
         """
@@ -171,14 +187,14 @@ class Atcom:
         self._read()
         self._send("AT+CMGL=\"REC UNREAD\"")
         ret = self._read()
-        # TODO mount an array with the orig, code, message #
         self._close_port()
+
         return ret
 
     def getMessagesCount(self):
         """
         Brief: Ask the module for the SMS messages number.
-        Return: The SMS messages number.
+        Return: The SMS messages count.
         """
         if self._open_port() == ERROR:
             return ERROR
@@ -244,6 +260,7 @@ class Atcom:
             return  {DATA_ORIG:orig, DATA_DATE:date, DATA_MSG:msg}
 
         except Exception, exc:
+            self._close_port()
             self.log.LOG(LOG_ERROR, "gsmcom.getMessageByIndex()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
@@ -253,14 +270,21 @@ class Atcom:
         Return: OK if could delete the message;
                 ERROR otherwise.
         """
-        if self._open_port() == ERROR:
+        try:
+            if self._open_port() == ERROR:
+                return ERROR
+    
+            self._send("AT+CMGD=%d" % msg_index)
+            ret = self._read()
+    
+            if ret.find(AT_OK) <= ERROR:
+                return ERROR
+    
+            self._close_port()
+            return OK
+
+        except Exception, exc:
+            self._close_port()
+            self.log.LOG(LOG_ERROR, "gsmcom.deleteMessage()", "Failed to delete message by index [%d]. %s: %s" % (msg_index, exc.__class__.__name__, exc))
             return ERROR
-
-        self._send("AT+CMGD=%d" % msg_index)
-        answer = self._read()
-
-        # TODO validate answer #
-
-        self._close_port()
-        return OK
 

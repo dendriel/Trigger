@@ -5,7 +5,7 @@
 #################################################################
 
 from libs.defines.defines import *
-from libs.shared.shared import shared
+from datetime import datetime
 
 class slog:
 
@@ -15,7 +15,6 @@ class slog:
 ##
     def __init__(self, directory):
         self.directory = directory
-        self.shared = shared()
 
 ##
 # Brief: create a log message with date, level, name of the caller function and any content.
@@ -37,7 +36,7 @@ class slog:
             elif level == LOG_CRITICAL:
                 lmsg = "CRITICAL"
 
-            file.write("%s - LOG LEVEL %s -- from %s -- message: %s\n" % (self.shared.makeTime(), lmsg, callerName, content))
+            file.write("%s - LOG LEVEL %s -- from %s -- message: %s\n" % (datetime.now(), lmsg, callerName, content))
             file.close()
 
             return OK
@@ -59,8 +58,4 @@ class slog:
         except IOError as (errno, strerror):
             print "I/O error({0}): {1}".format(errno, strerror)
             return ERROR
-
-    # maybe put in shared libs #
-    def makeDate():
-        pass
 
