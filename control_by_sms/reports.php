@@ -9,7 +9,10 @@ $canceled_b = "Canceled";
 $failed_b = "Failed";
 $sent_b = "Sent";
 
-if ($_GET != null) {
+
+$user_id = $_GET['user_id'];
+
+if ($user_id != null) {
 
     $con = new Postgrescom();
     
@@ -40,10 +43,14 @@ if ($_GET != null) {
             exit(0);
         }
     }
+}
 
-    $req_type = (int)$_GET['req_type'];
+
+$req_type = (int)$_GET['req_type'];
+
+if(($req_type) >= 0 or ($req_type <=3)) {
+
     $req_list = get_requisitions($req_type);
-
     switch($req_type) {
 
         case $ACTIVE: $header2 = $active_b; break;
@@ -122,14 +129,18 @@ function get_requisitions($req_type)
 
 function treat_str($msg)
 {
-    if(strlen($msg) > 60) {
-        $msg_ret.= substr($msg, 0, 59) . "<br />";
-        $msg_ret2.= substr($msg, 60);
+    if(strlen($msg) >= 60) {
+        $msg_ret.= substr($msg, 0, 54) . "<br />";
+        $msg_ret2.= substr($msg, 54);
 
-        if(strlen($msg_ret2) > 60) {
-            $msg_ret.= substr($msg_ret2, 0, 59) . "<br />";
-            $msg_ret.= substr($msg_ret2, 60);
+        if(strlen($msg_ret2) >= 60) {
+            $msg_ret.= substr($msg_ret2, 0, 54) . "<br />";
+            $msg_ret.= substr($msg_ret2, 54);
+
+        } else {
+            $msg_ret.= $msg_ret2;
         }
+
         return $msg_ret;
 
     } else {

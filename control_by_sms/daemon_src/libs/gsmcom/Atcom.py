@@ -244,9 +244,17 @@ class Atcom:
             self._read()
             self._send("AT+CMGR=%d" % msg_index)
             answer = self._read()
-            answer = answer.split() # ['at+cmgr=1', '+CMGR:', '"REC', 'UNREAD","04896710721",,"12/03/15,12:34:20-12"', 'vitor:', 'dosiajdadada', '0'] #
-            answer_sub = answer[3].split(",") # ['UNREAD"', '"04896710721"', '', '"12/03/15', '12:34:20-12"'] #
-            orig = answer_sub[1].split("\"")[1][3:] # '96710721' #
+            answer = answer.split() # ['at+cmgr=1', '+CMGR:', '"REC', 'UNREAD","04891553900",,"12/03/15,12:34:20-12"', 'vitor:', 'dosiajdadada', '0'] #
+            answer_sub = answer[3].split(",") # ['UNREAD"', '"04891553900"', '', '"12/03/15', '12:34:20-12"'] #
+
+            req_number = answer_sub[1].split("\"")[1]
+            if len(req_number) >= 11:
+                orig = req_number[3:] # '91553900' #
+            elif len(req_number) == 9:
+                orig = req_number[1:] # '91553900' #
+            else:
+                orig = req_number # '91553900' #
+
             date = answer_sub[3].split("\"")[1] + " " + answer_sub[4].split("\"")[0] # '12/03/15 12:34:20-12' #
             msg = ""
             msg_blocks = len(answer) - SMS_HEADER_FIELDS #

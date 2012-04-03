@@ -89,7 +89,7 @@ class block_control_by_sms extends block_base {
         $js.= "}\n";
 
     	$js.= "function open_reports() {\n";
-    	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type&user_id=$user_id','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.= "}\n";
 
     	$js.= "</script>\n";

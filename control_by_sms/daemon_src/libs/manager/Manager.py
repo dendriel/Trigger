@@ -1,5 +1,7 @@
 # -*-coding:utf-8-*-
+import sys
 import time
+import os
 import subprocess
 from threading import Thread
 from datetime import datetime
@@ -44,9 +46,9 @@ class Manager:
         """
         while(True):
 
-            #self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
+            self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
             self.sendService()
-            #self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
+            self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
             self.receiveService()
             time.sleep(MNGR_THRD_SLEEP)
 
@@ -181,8 +183,7 @@ class Manager:
                 ERROR otherwise.
         """
         # Create the script to validate origin and retrieve destination list #
-        #ret = self.validateOrigin(msg_data[DATA_ORIG])
-        ret = OK # Remove this line and uncomment line above; its for testing purpose #
+        ret = self.validateOrigin(msg_data[DATA_ORIG])
         if ret == INVALID:
             return INVALID
 
@@ -196,7 +197,7 @@ class Manager:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
-        dest_list = getDestinations(msg_values[DATA_DESTN])# dest_list -> needs to retrieve specified group cellphone address
+        dest_list = self.getDestinations(msg_values[DATA_DESTN])# dest_list -> needs to retrieve specified group cellphone address
 
         try:
             req_dict = {
@@ -231,8 +232,8 @@ class Manager:
             len_values = len(values)
 
             if len_values >= MIN_DATA_VALUES:
-            	orig = values[ORIG_P][0:MAX_ORIG_LEN]
-            	dest_code = values[CODE_P][0:MAX_DEST_CODE_LEN]
+                orig = values[ORIG_P][0:MAX_ORIG_LEN]
+                dest_code = values[CODE_P][0:MAX_DEST_CODE_LEN]
                 dt_data = values[DATETIME_P]
 
                 date_time = self.retrieveDateTime(dt_data)
@@ -266,13 +267,20 @@ class Manager:
         Return: A string with the recovered destination phones.
         """
         try:
-            val = subprocess.Popen([INTERPRETER, GET_NUMBER_PATH, dest_code])
-            destn = val.wait()
+            fstream = "./.get_destinations.stream"
+            out = subprocess.PIPE
+            val = subprocess.Popen([INTERPRETER, GET_NUMBER_PATH, dest_code], stdout=open(fstream, "w+"), stdin=subprocess.PIPE)
+            val.stdin.close()
+            val.wait()
+            destn = open(fstream, "r").read()
+            destn = destn
+
+            self.log.LOG(content=destn)
 
             if destn == VAL_NUM_MISSING:
                 return INVALID
 
-            elif destn == VAL_PRO_ERROR:
+            elif destn == VAL_PROC_ERROR:
                 return ERROR
 
             else:
@@ -290,8 +298,9 @@ class Manager:
                 exist; ERROR if something went wrong
         """
         try:
-            val = subprocess.Popen([INTERPRETER, VALIDATOR_PATH, number]);
-            validation_val = val.wait()
+            proc = subprocess.Popen([INTERPRETER, VALIDATOR_PATH, number], stdin=subprocess.PIPE)
+            proc.stdin.close()
+            validation_val = proc.wait()
 
             if validation_val == VAL_NUM_EXIST:
                 return OK

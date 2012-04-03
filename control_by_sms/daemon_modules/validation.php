@@ -13,7 +13,7 @@ include('../php/libs/Postgrescom.class.php');
 
 // args: number
 if (count($argv) < 2) {
-    exit(2);
+    exit(-2);
 
 } else {
     $number = $argv[1];
@@ -24,7 +24,7 @@ $con = new Postgrescom();
 $con->open();
 
 if($con->statusCon() == -1) {
-    exit(2);
+    exit(-2);
 }
 
 // mdl_role -> moodle access level for members
@@ -36,11 +36,11 @@ $val = $con->query($query);
 
 if ($val == -1) {
     // failed to query to the database.
-    exit(2);
+    exit(-2);
 
 } else if (pg_fetch_row($val) == null) {
     // there are no ocurrences.
-    exit(1);
+    exit(-1);
 
 } else {
     // there are ocurrences.

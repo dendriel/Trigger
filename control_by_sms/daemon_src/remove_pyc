@@ -6,6 +6,8 @@ echo "rm -f ./*.pyc"
 rm -f ./*.pyc
 echo "rm system.out"
 rm -f system.out
+echo "rm -rf .get_destinations.stream"
+rm -rf .get_destinations.stream
 echo "cd libs; rm -f *.pyc"
 cd libs; rm -f *.pyc
 echo "cd log; rm -f *.pyc;"

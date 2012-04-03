@@ -12,15 +12,18 @@ if($con->statusCon() == -1) {
     exit;
 }
 
-if($_GET['course_group'] != "") {
+if($_GET['course_group'] != null) {
 
     $group = $_GET['course_group'];
-    $users = $con->query("SELECT firstname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
+    $users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
 
     if ($users == -1) {
         echo "Error while communicating with the moodle database!";
         exit;
     }
+
+} else {
+    $users = "";
 }
 
 $user_id = $_GET['user_id'];
@@ -156,7 +159,7 @@ if ($_GET != null) {
     }
 
     // submit all //
-    //echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts;
+    #echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts;
 
     if (($origin_ts != null) and ($contacts_list != null) and ($message != null)) {
         try {

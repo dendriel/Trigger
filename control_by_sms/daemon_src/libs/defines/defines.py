@@ -91,16 +91,16 @@ SEPARATOR_CHAR = '@'
 SEPARATOR_CHAR_FOR_DB = ','
 MAX_ORIG_LEN = 7       # Maximum string length to identify the origin            #
 MAX_DEST_CODE_LEN = 7   # Maximum string length to identify the destination group #
-MODULE_PORT = "/dev/ttyACM0"
+MODULE_PORT = "/dev/ttyS0"
 RPC_PATHS = ('/RPC2')
 
 # Validator Parameters #
-VALIDATOR_PATH    = "../daemon_modules/validator.php" # not really defined yet... #
-GET_NUMBER_PATH   = "../daemon_modules/get_contacts.php" # not really defined yet... #
-VAL_NUMB_EXIST    = 0     # The validated number exist in database and is from a teacher #
-VAL_NUMB_MISSING  = 1     # The validated number does not exist for a teacher            #
-VAL_PROC_ERROR    = 2     # The validator failed to process the number                   #
-INTERPRETER       = "php" # what interpreter will run the "modular scripts" #
+VALIDATOR_PATH   = "../daemon_modules/validation.php" # not really defined yet... #
+GET_NUMBER_PATH  = "../daemon_modules/get_contacts.php" # not really defined yet... #
+VAL_NUM_EXIST    = 0     # The validated number exist in database and is from a teacher #
+VAL_NUM_MISSING  = 255     # The validated number does not exist for a teacher            #
+VAL_PROC_ERROR   = 254     # The validator failed to process the number                   #
+INTERPRETER      = "php" # what interpreter will run the "modular scripts" #
 
 
 # AT RETURN VALUES #
