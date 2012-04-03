@@ -167,16 +167,18 @@ if ($_GET != null) {
             
             if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime)) {
                 print 'Procedure returned error message: ' . $client->getErrorMessage() . '.';
+                exit(-1);
             }
             if ($client->getResponse() == $TRUE) {
                 echo "<br />Requisition successful registered!";
     
             } else {
                 echo "<br />Failed to communicate with the server!";
-                
+                exit(-1);
             }
         } catch (Exception $e) {
             echo "Failed to communicate with the server! $e";
+                exit(-1);
         }
     }
 
