@@ -2,8 +2,11 @@
 import socket
 from time import sleep
 from libs.defines.defines import *
+from libs.gsmcom.GsmTemplate import GsmTemplate
 
-class Amicom:
+# TODO this class is not really working right now #
+
+class Amicom(GsmTemplate):
 ##
 # Brief: set some parameters and set the family parameters for the socket channel
 ##

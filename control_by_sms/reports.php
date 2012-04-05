@@ -53,15 +53,42 @@ if(($req_type) >= 0 or ($req_type <=3)) {
     $req_list = get_requisitions($req_type);
     switch($req_type) {
 
-        case $ACTIVE: $header2 = $active_b; break;
-        case $CANCELED: $header2 = $canceled_b; break;
-        case $FAILED: $header2 = $failed_b; break;
-        case $SENT: $header2 = $sent_b; break;
+        case $ACTIVE: $header2 = $active_b; $th_color = "blue"; break;
+        case $CANCELED: $header2 = $canceled_b; $th_color = "red"; break;
+        case $FAILED: $header2 = $failed_b; $th_color = "yellow"; break;
+        case $SENT: $header2 = $sent_b; $th_color = "green"; break;
     }
 }
 
 $page.= "<html><head>";
 $page.= "<title>Control By SMS - Reports</title>";
+$page.= "<LINK REL=StyleSheet HREF=\"/moodle/theme/standard/style/core.css\" TYPE=\"text/css\" MEDIA=screen>";
+$page.= '<style type="text/css">
+table {
+    border-width: 1px;
+    border-spacing: 0px;
+    border-style: solid;
+    border-color: gray;
+    border-collapse: collapse;
+}
+th {
+    border-width: 1px;
+    padding: 1px;
+    border-style: dotted;
+    border-color: gray;
+    background-color: rgb(255, 245, 238)';//;$page.= $th_color;
+    $page.= '
+    -moz-border-radius: ;
+}
+td {
+    border-width: 1px;
+    padding: 22x;
+    border-style: dotted;
+    border-color: gray;
+    -moz-border-radius: ;
+}';
+$page.="</style>";
+
 $page.= "</head><body>";
 
 $page.= "<h1 align=\"center\">Reports</h1>";

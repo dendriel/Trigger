@@ -72,6 +72,11 @@ class block_control_by_sms extends block_base {
     {
     	global $COURSE;
         global $USER;
+        $w_height = 500;
+        $w_width = 600;
+
+        $w_height_r = 500;
+        $w_width_r = 830;
 
     	$course_id = $COURSE->id;
         $user_id = $USER->id;
@@ -81,7 +86,7 @@ class block_control_by_sms extends block_base {
     	$js.= "<script type=\"text/javascript\">\n";
 
     	$js.= "function schedule_sms() {\n";
-    	$js.= "window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=$course_id&user_id=$user_id','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=$course_id&user_id=$user_id','','scrollbars=no,menubar=no,height=$w_height,width=$w_width,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.=  "}\n";
 
         $js.= "function configure_feature() {\n";
@@ -89,7 +94,7 @@ class block_control_by_sms extends block_base {
         $js.= "}\n";
 
     	$js.= "function open_reports() {\n";
-    	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type&user_id=$user_id','','scrollbars=no,menubar=no,height=500,width=700,resizable=no,toolbar=no,location=no,status=no'); \n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type&user_id=$user_id','','scrollbars=no,menubar=no,height=$w_height_r,width=$w_width_r,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.= "}\n";
 
     	$js.= "</script>\n";

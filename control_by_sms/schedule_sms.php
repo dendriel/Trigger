@@ -81,11 +81,6 @@ $form.= "<tr>";
 $form.= "<td>";
 $form.= "<table border=\"1\">";
 
-    $form.= "<tr>";
-        $form.= "<td>";
-            $form.= $select_group;
-        $form.= "</td>";
-    $form.= "</tr>";
 
     $form.= "<tr>";
         $form.= "<td>";
@@ -93,14 +88,22 @@ $form.= "<table border=\"1\">";
         $form.= "</td>";
     $form.= "</tr>";
 
-$form.= "</table>";
-$form.= "</td>";
+    $form.= "<tr>";
+        $form.= "<td>";
+            $form.= $select_group;
+        $form.= "</td>";
+    $form.= "</tr>";
 
-$form.= "<td>";
+$form.= "<td border-style:solid;\">";
 $form.= $table_buttons;
 $form.= "</td>";
 
+$form.= "</table>";
+$form.= "</td>";
+
+
 $form.= "<form name=\"sms_service\" action=\"schedule_sms.php\" method=\"get\" onsubmit=\"return validateForm();\">";
+
 $form.= "<td>";
 $form.= $selected_table;
 $form.= "</td>";
