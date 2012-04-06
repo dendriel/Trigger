@@ -1,11 +1,10 @@
 # -*-coding:utf-8-*-
 import psycopg2
-#from defines import *
-#from slog import slog
-from libs.defines.defines import *
 import psycopg2.extensions
+from libs.defines.defines import *
+from libs.dbcom.DatabaseTemplate import DatabaseTemplate
 
-class Pgcom:
+class Pgcom(DatabaseTemplate):
 
     def __init__(self, db_host, db_user, db_pass, db_name, db_port, log_obj):
         """

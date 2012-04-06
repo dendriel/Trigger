@@ -3,6 +3,7 @@ import serial
 from time import sleep
 from libs.defines.defines import *
 from libs.log.slog import slog
+from libs.gsmcom.GsmTemplate import GsmTemplate
 
 # TODO Remove all the magic numbers and make macros #
 #     from the strings parameters. PLEASE!! I can't #
@@ -10,7 +11,7 @@ from libs.log.slog import slog
 TIME_BETWEEN_AT = 0.2 # seconds #
 SEND_SMS_DELAY = 20  # seconds #
 
-class Atcom:
+class Atcom(GsmTemplate):
 
     def __init__(self, log_obj="", wport="/dev/ttyACM0", bitrate="115200", mtype="default"):
 
@@ -180,7 +181,6 @@ class Atcom:
         Brief: Ask the module by "REC UNREAD" (read: NEW) messages.
         Return: Should returns a dictionary with the new messages.
         """
-
         if self._open_port() == ERROR:
             return ERROR
 

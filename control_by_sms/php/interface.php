@@ -50,6 +50,8 @@ function build_header()
     $header.= "<title>Control by SMS - Schedule</title>";
     $header.= "<script src=\"./js/interface.js\"></script>";
     $header.= "<script src=\"./js/validate.js\"></script>"; 
+    $header.= "<LINK REL=StyleSheet HREF=\"/moodle/theme/standard/style/core.css\" TYPE=\"text/css\" MEDIA=screen>";
+    $header.= "<LINK REL=StyleSheet HREF=\"style/plugin_style.css\" TYPE=\"text/css\" MEDIA=screen>";
     $header.= "</head><body>";
     $header.= "<h1 align=\"center\">SMS Service</h1>";
 
@@ -67,8 +69,8 @@ function build_tail()
  */
 function build_table_buttons()
 {
-    $button.= "<input type=\"button\" value=\"Add Item &rarr;\" onclick=\"addSelected();\" /><br />";
     $button.= "<input type=\"button\" value=\"&larr; Rem Item\" onclick=\"removeSelected();\" />";
+    $button.= "<input type=\"button\" value=\"Add Item &rarr;\" onclick=\"addSelected();\" />";
     
     return $button;
 }
@@ -81,7 +83,7 @@ function build_input_form($origin)
     $form.= "<table>";
 
     $form.= "<tr><td>";
-    $form.= "Origin:<input name=\"origin\" type=\"text\" value=\"$origin\" maxlength=7>";
+    $form.= "Origin:<br /><input name=\"origin\" type=\"text\" value=\"$origin\" maxlength=7 size=22>";
     $form.= "</td></tr>";
 
     $form.= "<tr><td>";
@@ -90,19 +92,24 @@ function build_input_form($origin)
 
     $form.= "<tr><td>";
     $form.= "<input type=\"radio\" name=\"sms_action\" id=\"sms_action0\" checked=\"yes\" value=\"0\" />Instant SMS";
-    $form.= "<input type=\"radio\" name=\"sms_action\" id=\"sms_action1\" value=\"1\" />Schedule SMS";
     $form.= "</td></tr>";
 
-    $form.= "<tr><td>";
-    $form.= "Date:<input name=\"date\" type=\"text\">";
-    $form.= "</td></tr>";
+    $form.= "<table style=\"border:2px inset;\">";
+        $form.= "<tr><td>";
+            $form.= "<input type=\"radio\" name=\"sms_action\" id=\"sms_action1\" value=\"1\" />Schedule SMS";
+        $form.= "</td></tr>";
 
-    $form.= "<tr><td>";
-    $form.= "Time (HH:MM format):<input name=\"time\" type=\"text\" maxlength=5>";
-    $form.= "</td></tr>";
+        $form.= "<tr><td>";
+            $form.= "Date:<br /><input name=\"date\" type=\"text\">";
+        $form.= "</td></tr>";
 
-    $form.= "<tr><td>";
-    $form.= "<input type=\"submit\">";
+        $form.= "<tr><td>";
+            $form.= "Time (HH:MM format):<br /><input name=\"time\" type=\"text\" maxlength=5>";
+        $form.= "</td></tr>";
+    $form.= "</table>";
+
+    $form.= "<tr><td style=\"border-style:none;text-align:center;\">";
+    $form.= "<input type=\"submit\" value=\"Register\">";
     $form.= "</td></tr>";
 
     $form.= "</table>";
@@ -113,7 +120,7 @@ function build_input_form($origin)
 function build_select_group_input() 
 {
     $form.= "<form method=\"get\" action=\"schedule_sms.php\">";
-    $form.= "Insert a destination group (by shortname):";
+    $form.= "Insert a destination group (by shortname):<br />";
     $form.= "<input name=\"course_group\" type=\"text\" maxlength=10>";
     $form.= "<input type=\"submit\" value=\"Retrive students\">";
     $form.= "</form>";

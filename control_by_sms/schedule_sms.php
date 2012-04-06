@@ -75,17 +75,13 @@ $tail = build_tail();
 
 $form.= $header;
 
-$form.= "<table border=\"2\">";
+$form.= "<div style=\"text-align:center;\">";
+$form.= "<table style=\" margin-left: auto; margin-right:auto;\">";
 $form.= "<tr>";
 
 $form.= "<td>";
 $form.= "<table border=\"1\">";
 
-    $form.= "<tr>";
-        $form.= "<td>";
-            $form.= $select_group;
-        $form.= "</td>";
-    $form.= "</tr>";
 
     $form.= "<tr>";
         $form.= "<td>";
@@ -93,14 +89,22 @@ $form.= "<table border=\"1\">";
         $form.= "</td>";
     $form.= "</tr>";
 
-$form.= "</table>";
-$form.= "</td>";
+    $form.= "<tr>";
+        $form.= "<td>";
+            $form.= $select_group;
+        $form.= "</td>";
+    $form.= "</tr>";
 
-$form.= "<td>";
+$form.= "<td border-style:solid;\">";
 $form.= $table_buttons;
 $form.= "</td>";
 
+$form.= "</table>";
+$form.= "</td>";
+
+
 $form.= "<form name=\"sms_service\" action=\"schedule_sms.php\" method=\"get\" onsubmit=\"return validateForm();\">";
+
 $form.= "<td>";
 $form.= $selected_table;
 $form.= "</td>";
@@ -112,6 +116,8 @@ $form.= "</td>";
 $form.= "</tr>";
 $form.= "</form>";
 $form.= "</table>";
+
+$form.= "</div>";
 
 $form.= $tail;
 
@@ -167,16 +173,18 @@ if ($_GET != null) {
             
             if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime)) {
                 print 'Procedure returned error message: ' . $client->getErrorMessage() . '.';
+                exit(-1);
             }
             if ($client->getResponse() == $TRUE) {
                 echo "<br />Requisition successful registered!";
     
             } else {
                 echo "<br />Failed to communicate with the server!";
-                
+                exit(-1);
             }
         } catch (Exception $e) {
             echo "Failed to communicate with the server! $e";
+                exit(-1);
         }
     }
 
