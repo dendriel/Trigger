@@ -75,7 +75,8 @@ $tail = build_tail();
 
 $form.= $header;
 
-$form.= "<table border=\"2\">";
+$form.= "<div style=\"text-align:center;\">";
+$form.= "<table style=\" margin-left: auto; margin-right:auto;\">";
 $form.= "<tr>";
 
 $form.= "<td>";
@@ -115,6 +116,8 @@ $form.= "</td>";
 $form.= "</tr>";
 $form.= "</form>";
 $form.= "</table>";
+
+$form.= "</div>";
 
 $form.= $tail;
 

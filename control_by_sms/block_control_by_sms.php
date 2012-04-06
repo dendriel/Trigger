@@ -30,14 +30,14 @@ class block_control_by_sms extends block_base {
             $schedule_sms.= '<tr>';
             $schedule_sms.= '<div style="text-align:center;"><b>';
             $schedule_sms.= '<a href="javascript: schedule_sms()">';
-            $schedule_sms.= get_string('schedule_sms', 'block_control_by_sms');
+            $schedule_sms.= get_string('schedule_sms_menu', 'block_control_by_sms');
             $schedule_sms.= '</a></b></div>';
             $schedule_sms.= '</tr>';
             // Reports //
             $schedule_sms.= '<tr>';
             $schedule_sms.= '<div style="text-align:center;"><b>';
             $schedule_sms.= '<a href="javascript: open_reports()">';
-            $schedule_sms.= 'Reports';
+            $schedule_sms.= get_string('reports_menu', 'block_control_by_sms');
             $schedule_sms.= '</a></b></div>';
             $schedule_sms.= '</tr>';
     
@@ -53,7 +53,7 @@ class block_control_by_sms extends block_base {
             $schedule_sms.= '<tr>';
             $schedule_sms.= '<div style="text-align:center;"><b>';
             $schedule_sms.= '<a>';
-            $schedule_sms.= 'Service stopped. Contact the admin for more information.';
+            $schedule_sms.= get_string('service_stopped', 'block_control_by_sms');
             $schedule_sms.= '</a></b></div>';
             $schedule_sms.= '</tr>';
         }
@@ -63,7 +63,7 @@ class block_control_by_sms extends block_base {
         $content.= '</body></html>';
 
     	$this->content->text   = $content;
-    	$this->content->footer = "Developed By Vitor Rozsa";
+    	$this->content->footer = get_string('footnote', 'block_control_by_sms');
     	
     	return $this->content;
     }

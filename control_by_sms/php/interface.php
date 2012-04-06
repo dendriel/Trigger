@@ -51,9 +51,7 @@ function build_header()
     $header.= "<script src=\"./js/interface.js\"></script>";
     $header.= "<script src=\"./js/validate.js\"></script>"; 
     $header.= "<LINK REL=StyleSheet HREF=\"/moodle/theme/standard/style/core.css\" TYPE=\"text/css\" MEDIA=screen>";
-    $header.= "<style type=\"text/css\">";
-        $header.= "td {border-style:none; text-align:center; vertical-align:top;}";
-    $header.= "</style>";
+    $header.= "<LINK REL=StyleSheet HREF=\"style/plugin_style.css\" TYPE=\"text/css\" MEDIA=screen>";
     $header.= "</head><body>";
     $header.= "<h1 align=\"center\">SMS Service</h1>";
 

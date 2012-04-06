@@ -53,10 +53,26 @@ if(($req_type) >= 0 or ($req_type <=3)) {
     $req_list = get_requisitions($req_type);
     switch($req_type) {
 
-        case $ACTIVE: $header2 = $active_b; $th_color = "blue"; break;
-        case $CANCELED: $header2 = $canceled_b; $th_color = "red"; break;
-        case $FAILED: $header2 = $failed_b; $th_color = "yellow"; break;
-        case $SENT: $header2 = $sent_b; $th_color = "green"; break;
+        case $ACTIVE: 
+            $header2 = $active_b; 
+            $tr_color = "6c9";
+            $th_color = "6f9"; 
+        break;
+        case $CANCELED: 
+            $header2 = $canceled_b; 
+            $tr_color = "fc9";
+            $th_color = "ff9"; 
+        break;
+        case $FAILED: 
+            $header2 = $failed_b; 
+            $tr_color = "f66";
+            $th_color = "f99"; 
+        break;
+        case $SENT: 
+            $header2 = $sent_b; 
+            $tr_color = "6cf";
+            $th_color = "6ff"; 
+        break;
     }
 }
 
@@ -76,8 +92,6 @@ th {
     padding: 1px;
     border-style: dotted;
     border-color: gray;
-    background-color: rgb(255, 245, 238)';//;$page.= $th_color;
-    $page.= '
     -moz-border-radius: ;
 }
 td {
@@ -109,7 +123,7 @@ $page.= "<h2 align=\"center\"><u>$header2</u></h2>";
 $table.= "<div align=\"center\">";
 $table.= "<table border=\"1\">";
 
-$table.= "<tr>";
+$table.= "<tr style=\"background-color:$tr_color;\">";
 $table.= "<th>Origin</th>";
 $table.= "<th>Message</th>";
 $table.= "<th>Blow</th>";
@@ -120,7 +134,7 @@ $table.= "</tr>";
 if ($req_list != null) {
 
     for ($index=0; $index < count($req_list); $index++) {
-        $table.= "<tr>";
+        $table.= "<tr style=\"background-color:$th_color\">";
         $table.= "<td>" . $req_list[$index][$ORIG] . "</td>";
         $table.= "<td>" . treat_str($req_list[$index][$MSG]) . "</td>";
         $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
