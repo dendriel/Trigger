@@ -7,6 +7,10 @@
  * Brief: Functions that will build the schedule page.
  *******************************************************/
 
+include_once('libs/IXR_Library.inc.php');
+include_once('defines.php');
+
+
 /* global */
 $TBL_SIZE = 10;
 
@@ -117,6 +121,9 @@ function build_input_form($origin)
     return $form;
 }
 
+/********************************************************
+ * Brief: Build input field that will recover groups list.
+ */
 function build_select_group_input() 
 {
     $form.= "<form method=\"get\" action=\"schedule_sms.php\">";
@@ -128,6 +135,9 @@ function build_select_group_input()
     return $form;
 }
 
+/********************************************************
+ * Brief: Format that input.
+ */
 function mount_date($date_obj)
 {
     $date.= $date_obj->hour . ":" . $date_obj->minute;
@@ -137,6 +147,9 @@ function mount_date($date_obj)
     return $date;
 }
 
+/********************************************************
+ * Brief: Format the given string to be displayed.
+ */
 function treat_str($msg)
 {
     if(strlen($msg) >= 60) {
@@ -157,4 +170,28 @@ function treat_str($msg)
         return $msg;
     }
 }
+
+/********************************************************
+ * Brief: Recover the specified type of requisitions from 
+ *      server.
+ */
+function get_requisitions($req_type) 
+{
+    global $server_address;
+    try {
+        $client = new IXR_Client($server_address);
+        
+        if (! $client->query('getRequisitions', $req_type)) {
+            return null;
+        }
+        $req_list = $client->getResponse();
+    
+        return $req_list;
+    
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 ?>
+

@@ -1,40 +1,28 @@
 <?php
-include('./php/interface.php');
 include('./php/libs/Postgrescom.class.php');
 include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
+include('./php/interface.php');
+require_once("./lang/en/block_control_by_sms.php");
 
+// MUST be opened here //
 $con = new Postgrescom();
-
 $con->open();
 if($con->statusCon() == -1) {
-    echo get_string('conection_failed', 'block_control_by_sms');
+
+    echo $string['conection_failed'];
     exit(-1);
 }
 
-if($_GET['course_group'] != null) {
-
-    $group = $_GET['course_group'];
-    $users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
-
-    if ($users == -1) {
-        echo get_string('conection_failed', 'block_control_by_sms');
-        exit;
-    }
-
-} else {
-    $users = "";
-}
-
-$user_id = $_GET['user_id'];
 
 // Test if the user is allowed to use the feature //
+$user_id = $_GET['user_id'];
 if ($user_id != null) {
 
     $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
 
     if ($answer == -1) {
-        echo get_string('conection_failed', 'block_control_by_sms');
+        echo $string['conection_failed'];
         exit(-1);
 
     } else {
@@ -48,7 +36,7 @@ if ($user_id != null) {
             }
         }
         if ($ok == false) {
-            echo get_string('not_allowed', 'block_control_by_sms');
+            echo $string['not_allowed'];
             exit(0);
         }
     }
@@ -56,7 +44,7 @@ if ($user_id != null) {
     // Select the lastname of the user to fill the origin field //
     $origin = $con->query("SELECT lastname FROM mdl_user WHERE id=$user_id");
     if ($origin == -1) {
-        echo get_string('conection_failed', 'block_control_by_sms');
+        echo $string['conection_failed'];
         exit(-1);
     } else {
         $origin = pg_fetch_row($origin);
@@ -64,13 +52,26 @@ if ($user_id != null) {
     }
 } 
 
-$header = build_header();
-$select_group = build_select_group_input();
+if($_GET['course_group'] != null) {
+
+    $group = $_GET['course_group'];
+    $users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
+
+    if ($users == -1) {
+        echo $string['conection_failed'];
+        exit(-1);
+    }
+} else {
+    $users = "";
+}
+
+$header         = build_header();
+$select_group   = build_select_group_input();
 $contacts_table = build_contacts_table($users);
-$table_buttons = build_table_buttons();
+$table_buttons  = build_table_buttons();
 $selected_table = build_empty_table();
-$input_form = build_input_form($origin);
-$tail = build_tail();
+$input_form     = build_input_form($origin);
+$tail           = build_tail();
 
 
 $form.= $header;
@@ -81,7 +82,6 @@ $form.= "<tr>";
 
 $form.= "<td>";
 $form.= "<table border=\"1\">";
-
 
     $form.= "<tr>";
         $form.= "<td>";
@@ -124,7 +124,6 @@ $form.= $tail;
 echo $form;
 
 $con->close();
-
 ?>
 
 <?php
@@ -172,22 +171,22 @@ if ($_GET != null) {
             $client = new IXR_Client($server_address);
             
             if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime)) {
-                echo get_string('daemon_error', 'block_control_by_sms') . $client->getErrorMessage() . '.';
+                echo $string['daemon_error']; // . $client->getErrorMessage() . '.';
                 exit(-1);
             }
             if ($client->getResponse() == $TRUE) {
-                echo "<br />" . get_string('requisition_ok', 'blocK_control_by_sms');
+                echo $string['requisition_ok'];
     
             } else {
-                echo get_string('daemon_error', 'block_control_by_sms');
+                echo $string['daemon_error'];
                 exit(-1);
             }
         } catch (Exception $e) {
-                echo get_string('daemon_error', 'block_control_by_sms'); // $e;
+                echo $string['daemon_error']; // $e;
                 exit(-1);
         }
     }
-
 }
+
 ?>
 
