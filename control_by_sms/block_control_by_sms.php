@@ -100,6 +100,5 @@ class block_control_by_sms extends block_base {
     	$js.= "</script>\n";
     
     	echo $js;
-
     }
 } 

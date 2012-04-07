@@ -8,8 +8,8 @@ $con = new Postgrescom();
 
 $con->open();
 if($con->statusCon() == -1) {
-    echo "conexao falhou!";
-    exit;
+    echo get_string('conection_failed', 'block_control_by_sms');
+    exit(-1);
 }
 
 if($_GET['course_group'] != null) {
@@ -18,7 +18,7 @@ if($_GET['course_group'] != null) {
     $users = $con->query("SELECT firstname,lastname,phone2 FROM mdl_user WHERE id IN (SELECT userid FROM mdl_groups_members WHERE groupid IN (SELECT id FROM mdl_groups WHERE name='$group'));");
 
     if ($users == -1) {
-        echo "Error while communicating with the moodle database!";
+        echo get_string('conection_failed', 'block_control_by_sms');
         exit;
     }
 
@@ -34,8 +34,8 @@ if ($user_id != null) {
     $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
 
     if ($answer == -1) {
-        echo "Error while communicating with the moodle database!";
-        exit;
+        echo get_string('conection_failed', 'block_control_by_sms');
+        exit(-1);
 
     } else {
         $allowed = pg_fetch_all($answer);
@@ -48,7 +48,7 @@ if ($user_id != null) {
             }
         }
         if ($ok == false) {
-            echo "You don't have permission to use this feature!";
+            echo get_string('not_allowed', 'block_control_by_sms');
             exit(0);
         }
     }
@@ -56,8 +56,8 @@ if ($user_id != null) {
     // Select the lastname of the user to fill the origin field //
     $origin = $con->query("SELECT lastname FROM mdl_user WHERE id=$user_id");
     if ($origin == -1) {
-        echo "Error while communicating with the moodle database!";
-        exit;
+        echo get_string('conection_failed', 'block_control_by_sms');
+        exit(-1);
     } else {
         $origin = pg_fetch_row($origin);
         $origin = $origin[0];
@@ -172,18 +172,18 @@ if ($_GET != null) {
             $client = new IXR_Client($server_address);
             
             if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime)) {
-                print 'Procedure returned error message: ' . $client->getErrorMessage() . '.';
+                echo get_string('daemon_error', 'block_control_by_sms') . $client->getErrorMessage() . '.';
                 exit(-1);
             }
             if ($client->getResponse() == $TRUE) {
-                echo "<br />Requisition successful registered!";
+                echo "<br />" . get_string('requisition_ok', 'blocK_control_by_sms');
     
             } else {
-                echo "<br />Failed to communicate with the server!";
+                echo get_string('daemon_error', 'block_control_by_sms');
                 exit(-1);
             }
         } catch (Exception $e) {
-            echo "Failed to communicate with the server! $e";
+                echo get_string('daemon_error', 'block_control_by_sms'); // $e;
                 exit(-1);
         }
     }

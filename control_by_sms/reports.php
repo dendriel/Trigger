@@ -4,10 +4,10 @@ include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
 include('./php/interface.php');
 
-$active_b = "Active";
-$canceled_b = "Canceled";
-$failed_b = "Failed";
-$sent_b = "Sent";
+$active_b = get_string('active', 'block_control_by_sms');;
+$canceled_b = get_string('canceled', 'block_control_by_sms');; 
+$failed_b = get_string('failed', 'block_control_by_sms');;
+$sent_b = get_string('sent', 'block_control_by_sms');;
 
 
 $user_id = $_GET['user_id'];
@@ -18,15 +18,15 @@ if ($user_id != null) {
     
     $con->open();
     if($con->statusCon() == -1) {
-        echo "conexao falhou!";
-        exit;
+        echo get_string('conection_failed', 'block_control_by_sms');
+        exit(-1);
     }
 
     $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
 
     if ($answer == -1) {
-        echo "Error while communicating with the moodle database!";
-        exit;
+        echo get_string('conection_failed', 'block_control_by_sms');
+        exit(-1);
     } else {
         $allowed = pg_fetch_all($answer);
         $allowed_len = count($allowed);
@@ -39,7 +39,7 @@ if ($user_id != null) {
             }
         }
         if ($ok == false) {
-            echo "You don't have permission to use this feature!";
+            echo get_string('not_allowed', 'block_control_by_sms');
             exit(0);
         }
     }
@@ -55,23 +55,23 @@ if(($req_type) >= 0 or ($req_type <=3)) {
 
         case $ACTIVE: 
             $header2 = $active_b; 
-            $tr_color = "6c9";
-            $th_color = "6f9"; 
+            $tr_color = get_string('green_header', 'block_control_by_sms');
+            $th_color = get_string('green_body', 'block_control_by_sms');
         break;
         case $CANCELED: 
             $header2 = $canceled_b; 
-            $tr_color = "fc9";
-            $th_color = "ff9"; 
+            $tr_color = get_string('yellow_header', 'block_control_by_sms');
+            $th_color = get_string('yellow_body', 'block_control_by_sms');
         break;
         case $FAILED: 
             $header2 = $failed_b; 
-            $tr_color = "f66";
-            $th_color = "f99"; 
+            $tr_color = get_string('red_header', 'block_control_by_sms');
+            $th_color = get_string('red_body', 'block_control_by_sms');
         break;
         case $SENT: 
             $header2 = $sent_b; 
-            $tr_color = "6cf";
-            $th_color = "6ff"; 
+            $tr_color = get_string('blue_header', 'block_control_by_sms');
+            $th_color = get_string('blue_body', 'block_control_by_sms');
         break;
     }
 }
@@ -105,7 +105,7 @@ $page.="</style>";
 
 $page.= "</head><body>";
 
-$page.= "<h1 align=\"center\">Reports</h1>";
+$page.= "<h1 align=\"center\">" . get_string('reports_title', 'block_control_by_sms') . "</h1>";
 
 // Reports options table //
 $page.= "<div align=\"center\">";
@@ -124,10 +124,10 @@ $table.= "<div align=\"center\">";
 $table.= "<table border=\"1\">";
 
 $table.= "<tr style=\"background-color:$tr_color;\">";
-$table.= "<th>Origin</th>";
-$table.= "<th>Message</th>";
-$table.= "<th>Blow</th>";
-$table.= "<th>Destination[s]</th>";
+$table.= "<th>" . get_string('origin_col', 'block_control_by_sms') . "</th>";
+$table.= "<th>" . get_string('message_col', 'block_control_by_sms') . "</th>";
+$table.= "<th>" . get_string('blow_col', 'block_control_by_sms') . "</th>";
+$table.= "<th>" . get_string('destination_col', 'block_control_by_sms') . "</th>";
 $table.= "</tr>";
 
 // Mount table
@@ -155,7 +155,7 @@ function get_requisitions($req_type)
         $client = new IXR_Client($server_address);
         
         if (! $client->query('getRequisitions', $req_type)) {
-            print 'Procedure returned error message: ' . $client->getErrorMessage() . '.';
+            echo get_string('daemon_error', 'block_control_by_sms') . $client->getErrorMessage() . '.';
             return null;
         }
         $req_list = $client->getResponse();
@@ -163,7 +163,7 @@ function get_requisitions($req_type)
         return $req_list;
     
     } catch (Exception $e) {
-        echo "Failed to communicate with the server! $e";
+        echo get_string('daemon_error', 'block_control_by_sms'); // $e;
         return null;
     }
 }
@@ -189,13 +189,5 @@ function treat_str($msg)
     }
 }
 
-function mount_date($date_obj)
-{
-    $date.= $date_obj->hour . ":" . $date_obj->minute;
-    $date.= " - ";
-    $date.= $date_obj->day . "/" . $date_obj->month . "/" . $date_obj->year;
-
-    return $date;
-}
 
 ?>

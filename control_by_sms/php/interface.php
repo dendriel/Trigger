@@ -127,5 +127,14 @@ function build_select_group_input()
 
     return $form;
 }
+
+function mount_date($date_obj)
+{
+    $date.= $date_obj->hour . ":" . $date_obj->minute;
+    $date.= " - ";
+    $date.= $date_obj->day . "/" . $date_obj->month . "/" . $date_obj->year;
+
+    return $date;
+}
 ?>
 
