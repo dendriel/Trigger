@@ -12,7 +12,7 @@
 
 // Global menu Strings //
  $string['schedule_sms_menu'] = "Agendar SMS";
- $string['reports_menu'] = "Relatórios";
+ $string['reports_menu'] = "RelatÃ³rios";
  $string['footnote'] = "Desenvolvido por Vitor Rozsa";
  $string['service_stopped'] = "Serviço interrompido. Entre em contato com o administrador para mais informções.";
 
@@ -67,5 +67,24 @@
  $string['message_col'] = "Mensagem";
  $string['blow_col'] = "Envio";
  $string['destination_col'] = "Destinos";
+
+// Schedule strings //
+ $string['avaliable'] = "Disponi­vel";
+ $string['selected'] = "Selecionados";
+ $string['schedule_title'] = "Agendar SMS";
+
+ $string['rm_buttom'] = "&larr; [-] Destino";
+ $string['add_buttom'] = "Destino [+] &rarr;";
+
+ $string['input_origin'] = "Origem";
+ $string['input_message'] = "Mensagem";
+ $string['instant_sms'] = "Enviar agora";
+ $string['schedule_sms'] = "Agendar SMS";
+ $string['max_text_length'] = "M&aacute;x.149 caracteres.";
+ $string['input_date'] = "Data";
+ $string['input_time'] = "Hora [hh:mm]";
+ $string['register'] = "Enviar dados";
+ $string['retrieve_dest_title'] = "Insira um grupo de destino";
+ $string['retrieve_dest_buttom'] = "Buscar";
 
 ?>

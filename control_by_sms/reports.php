@@ -3,7 +3,7 @@ include('./php/libs/Postgrescom.class.php');
 include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
 include('./php/interface.php');
-require_once("./lang/en/block_control_by_sms.php");
+include("./lang/en/block_control_by_sms.php");
 
 
 $active_b = $string['active'];

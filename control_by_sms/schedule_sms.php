@@ -85,13 +85,13 @@ $form.= "<table border=\"1\">";
 
     $form.= "<tr>";
         $form.= "<td>";
-            $form.= $contacts_table;
+            $form.= $select_group;
         $form.= "</td>";
     $form.= "</tr>";
 
     $form.= "<tr>";
         $form.= "<td>";
-            $form.= $select_group;
+            $form.= $contacts_table;
         $form.= "</td>";
     $form.= "</tr>";
 
@@ -159,7 +159,7 @@ if ($_GET != null) {
         $send = False;
 
     } else {
-        $datetime = "10/10/2012 20:30:30"; 
+        $datetime = "30/12/2030 23:59:00"; 
         $send = True;
     }
 
