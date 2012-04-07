@@ -136,5 +136,25 @@ function mount_date($date_obj)
 
     return $date;
 }
-?>
 
+function treat_str($msg)
+{
+    if(strlen($msg) >= 60) {
+        $msg_ret.= substr($msg, 0, 54) . "<br />";
+        $msg_ret2.= substr($msg, 54);
+
+        if(strlen($msg_ret2) >= 60) {
+            $msg_ret.= substr($msg_ret2, 0, 54) . "<br />";
+            $msg_ret.= substr($msg_ret2, 54);
+
+        } else {
+            $msg_ret.= $msg_ret2;
+        }
+
+        return $msg_ret;
+
+    } else {
+        return $msg;
+    }
+}
+?>

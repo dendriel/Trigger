@@ -4,10 +4,10 @@ include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
 include('./php/interface.php');
 
-$active_b = get_string('active', 'block_control_by_sms');;
-$canceled_b = get_string('canceled', 'block_control_by_sms');; 
-$failed_b = get_string('failed', 'block_control_by_sms');;
-$sent_b = get_string('sent', 'block_control_by_sms');;
+//$active_b = get_string('active', 'block_control_by_sms');
+//$canceled_b = get_string('canceled', 'block_control_by_sms');
+//$failed_b = get_string('failed', 'block_control_by_sms');
+//$sent_b = get_string('sent', 'block_control_by_sms');
 
 
 $user_id = $_GET['user_id'];
@@ -18,14 +18,14 @@ if ($user_id != null) {
     
     $con->open();
     if($con->statusCon() == -1) {
-        echo get_string('conection_failed', 'block_control_by_sms');
+//        echo get_string('conection_failed', 'block_control_by_sms');
         exit(-1);
     }
 
     $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
 
     if ($answer == -1) {
-        echo get_string('conection_failed', 'block_control_by_sms');
+//        echo get_string('conection_failed', 'block_control_by_sms');
         exit(-1);
     } else {
         $allowed = pg_fetch_all($answer);
@@ -39,13 +39,13 @@ if ($user_id != null) {
             }
         }
         if ($ok == false) {
-            echo get_string('not_allowed', 'block_control_by_sms');
+//            echo get_string('not_allowed', 'block_control_by_sms');
             exit(0);
         }
     }
 }
 
-
+/*
 $req_type = (int)$_GET['req_type'];
 
 if(($req_type) >= 0 or ($req_type <=3)) {
@@ -105,7 +105,9 @@ $page.="</style>";
 
 $page.= "</head><body>";
 
-$page.= "<h1 align=\"center\">" . get_string('reports_title', 'block_control_by_sms') . "</h1>";
+$page.= "<h1 align=\"center\">";
+$page.= get_string('reports_title', 'block_control_by_sms');
+$page.= "</h1>";
 
 // Reports options table //
 $page.= "<div align=\"center\">";
@@ -136,9 +138,9 @@ if ($req_list != null) {
     for ($index=0; $index < count($req_list); $index++) {
         $table.= "<tr style=\"background-color:$th_color\">";
         $table.= "<td>" . $req_list[$index][$ORIG] . "</td>";
-        $table.= "<td>" . treat_str($req_list[$index][$MSG]) . "</td>";
-        $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
-        $table.= "<td>" . treat_str($req_list[$index][$DESTN]) . "</td>";
+//        $table.= "<td>" . treat_str($req_list[$index][$MSG]) . "</td>";
+  //      $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
+    //    $table.= "<td>" . treat_str($req_list[$index][$DESTN]) . "</td>";
         $table.= "</tr>";
     }
 }
@@ -155,7 +157,7 @@ function get_requisitions($req_type)
         $client = new IXR_Client($server_address);
         
         if (! $client->query('getRequisitions', $req_type)) {
-            echo get_string('daemon_error', 'block_control_by_sms') . $client->getErrorMessage() . '.';
+            echo get_string('daemon_error', 'block_control_by_sms');
             return null;
         }
         $req_list = $client->getResponse();
@@ -166,28 +168,5 @@ function get_requisitions($req_type)
         echo get_string('daemon_error', 'block_control_by_sms'); // $e;
         return null;
     }
-}
-
-function treat_str($msg)
-{
-    if(strlen($msg) >= 60) {
-        $msg_ret.= substr($msg, 0, 54) . "<br />";
-        $msg_ret2.= substr($msg, 54);
-
-        if(strlen($msg_ret2) >= 60) {
-            $msg_ret.= substr($msg_ret2, 0, 54) . "<br />";
-            $msg_ret.= substr($msg_ret2, 54);
-
-        } else {
-            $msg_ret.= $msg_ret2;
-        }
-
-        return $msg_ret;
-
-    } else {
-        return $msg;
-    }
-}
-
-
+}*/
 ?>

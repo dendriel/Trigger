@@ -1,6 +1,5 @@
 <?php
-	$string['pluginname'] = 'Control by SMS block';
-	$string['control_by_sms'] = 'Control by SMS';
+	$string['pluginname'] = "Control by SMS";
 	
 	#$string['daemon_configuration'] = "<html><body><b>-Daemon Configuration-</b></body></html>";
 	$string['allow_to_use'] = 'Permitir aos professores utilizarem o serviço de SMS?';
@@ -14,7 +13,7 @@
 // Global menu Strings //
  $string['schedule_sms_menu'] = "Agendar SMS";
  $string['reports_menu'] = "Relatórios";
- $string['footnote'] = "Desenvolvido por Vitor Rozsa";
+ $string['footnote'] = "Desenvolvido por Vitor Rozsaaaaa";
  $string['service_stopped'] = "Serviço interrompido. Entre em contato com o administrador para mais informções.";
 
 // Status Strings //
@@ -45,5 +44,4 @@
  $string['message_col'] = "Mensagem";
  $string['blow_col'] = "Envio";
  $string['destination_col'] = "Destinos";
- $string[''] = "";
 
