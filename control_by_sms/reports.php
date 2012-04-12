@@ -5,6 +5,10 @@ include('./php/defines.php');
 include('./php/interface.php');
 include("./lang/en/block_control_by_sms.php");
 
+$active_b = get_string('active', 'block_control_by_sms');
+$canceled_b = get_string('canceled', 'block_control_by_sms');
+$failed_b = get_string('failed', 'block_control_by_sms');
+$sent_b = get_string('sent', 'block_control_by_sms');
 
 $active_b = $string['active'];
 $canceled_b = $string['canceled'];

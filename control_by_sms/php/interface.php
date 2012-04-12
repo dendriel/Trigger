@@ -192,6 +192,7 @@ function treat_str($msg)
  * Brief: Recover the specified type of requisitions from 
  *      server.
  */
+
 function get_requisitions($req_type) 
 {
     global $server_address;
@@ -199,6 +200,7 @@ function get_requisitions($req_type)
         $client = new IXR_Client($server_address);
         
         if (! $client->query('getRequisitions', $req_type)) {
+            echo get_string('daemon_error', 'block_control_by_sms');
             return null;
         }
         $req_list = $client->getResponse();
@@ -206,9 +208,8 @@ function get_requisitions($req_type)
         return $req_list;
     
     } catch (Exception $e) {
+        echo get_string('daemon_error', 'block_control_by_sms'); // $e;
         return null;
     }
 }
-
 ?>
-
