@@ -4,10 +4,10 @@ include('./php/libs/IXR_Library.inc.php');
 include('./php/defines.php');
 include('./php/interface.php');
 
-$active_b = get_string('active', 'block_control_by_sms');;
-$canceled_b = get_string('canceled', 'block_control_by_sms');; 
-$failed_b = get_string('failed', 'block_control_by_sms');;
-$sent_b = get_string('sent', 'block_control_by_sms');;
+$active_b = get_string('active', 'block_control_by_sms');
+$canceled_b = get_string('canceled', 'block_control_by_sms');
+$failed_b = get_string('failed', 'block_control_by_sms');
+$sent_b = get_string('sent', 'block_control_by_sms');
 
 
 $user_id = $_GET['user_id'];
@@ -155,7 +155,7 @@ function get_requisitions($req_type)
         $client = new IXR_Client($server_address);
         
         if (! $client->query('getRequisitions', $req_type)) {
-            echo get_string('daemon_error', 'block_control_by_sms') . $client->getErrorMessage() . '.';
+            echo get_string('daemon_error', 'block_control_by_sms');
             return null;
         }
         $req_list = $client->getResponse();
