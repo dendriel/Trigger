@@ -8,7 +8,7 @@
 	$string['descconfig'] = "Sei la2 ";
 
 	$string['label_open_to_use'] = "Permitir aos professores utilizarem o serviço de SMS?";
-	$string['desc_open_to_use'] =  "Use esta opção para permitir ou negar o uso do serviço de SMS elo fórum.";
+	$string['desc_open_to_use'] =  "Use esta opção para permitir ou negar o uso do serviço de SMS pelo fórum.";
 
 // Global menu Strings //
  $string['schedule_sms_menu'] = "Agendar SMS";

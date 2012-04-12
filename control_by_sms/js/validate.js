@@ -3,8 +3,8 @@
  */
 // Declaring valid date character, minimum year and maximum year
 var dtCh= "/";
-var minYear=1900;
-var maxYear=2100;
+var minYear=2012; //TODO retrieve current year.
+var maxYear=minYear+1;
 
 function isInteger(s){
     var i;
@@ -50,40 +50,38 @@ function isDate(dtStr){
     var pos2=dtStr.indexOf(dtCh,pos1+1)
     var strDay=dtStr.substring(0,pos1)
     var strMonth=dtStr.substring(pos1+1,pos2)
-//    var strMonth=dtStr.substring(0,pos1)
-//    var strDay=dtStr.substring(pos1+1,pos2)
     var strYear=dtStr.substring(pos2+1)
     strYr=strYear
 
-    if (strDay.charAt(0)=="0" && strDay.length>1) strDay=strDay.substring(1)
-    if (strMonth.charAt(0)=="0" && strMonth.length>1) strMonth=strMonth.substring(1)
+    if (strDay.charAt(0)=="0" && strDay.length>1) strDay=strDay.substring(1);
+    if (strMonth.charAt(0)=="0" && strMonth.length>1) strMonth=strMonth.substring(1);
     for (var i = 1; i <= 3; i++) {
-        if (strYr.charAt(0)=="0" && strYr.length>1) strYr=strYr.substring(1)
+        if (strYr.charAt(0)=="0" && strYr.length>1) strYr=strYr.substring(1);
     }
-    month=parseInt(strMonth)
-    day=parseInt(strDay)
-    year=parseInt(strYr)
+    month=parseInt(strMonth);
+    day=parseInt(strDay);
+    year=parseInt(strYr);
     if (pos1==-1 || pos2==-1){
-        alert("The date format should be : dd/mm/yyyy")
-        return false
+        alert("O formato da data deve ser: dd/mm/yyyy.");
+        return false;
     }
     if (strMonth.length<1 || month<1 || month>12){
-        alert("Please enter a valid month")
-        return false
+        alert("Mês definido é inválido.");
+        return false;
     }
     if (strDay.length<1 || day<1 || day>31 || (month==2 && day>daysInFebruary(year)) || day > daysInMonth[month]){
-        alert("Please enter a valid day")
-        return false
+        alert("Dia definido é inválido.");
+        return false;
     }
     if (strYear.length != 4 || year==0 || year<minYear || year>maxYear){
-        alert("Please enter a valid 4 digit year between "+minYear+" and "+maxYear)
-        return false
+        alert("Entre com um ano dentro do intervalo "+minYear+" - "+maxYear ".");
+        return false;
     }
     if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
-        alert("Please enter a valid date")
-        return false
+        alert("Entre com uma data válida.");
+        return false;
     }
-return true
+return true;
 }
 
 // Radio Button Validation
@@ -105,56 +103,37 @@ function valButton(btn) {
 
 <!-- This script and many more are available free online at -->
 <!-- The JavaScript Source!! http://javascript.internet.com -->
-
-<!-- Begin -->
 */
 function isValidTime(timeStr)
 {
 // Checks if time is in HH:MM:SS AM/PM format.
-// The seconds and AM/PM are optional.
     var timePat = /^(\d{1,2}):(\d{2})?$/;
-    //var timePat = /^(\d{1,2}):(\d{2})(:(\d{2}))?(\s?(AM|am|PM|pm))?$/;
-    
+
     var matchArray = timeStr.match(timePat);
 
     if (matchArray == null) {
-        alert("Time is not in a valid format.");
+        alert("O tempo deve estar no formato hora:minuto.");
         return false;
     }
     hour = matchArray[1];
     minute = matchArray[2];
     second = "00";
-    //second = matchArray[4];
     ampm = null;
-    //ampm = matchArray[6];
-    
-    if (second=="") { second = null; }
-    if (ampm=="") { ampm = null }
-    
+
+    if (second == "") {
+        second = null;
+    }
+    if (ampm=="") {
+        ampm = null;
+    }
     if (hour < 0  || hour > 23) {
-        alert("Hour must be between 0 and 23.");
+        alert("Hora inválida.");
         return false;
     }
-/*    if (hour <= 12 && ampm == null) {
-        if (confirm("Please indicate which time format you are using.  OK = Standard Time, CANCEL = Military Time")) {
-            alert("You must specify AM or PM.");
-            return false;
-       }
-    }
-    if  (hour > 12 && ampm != null) {
-        alert("You can't specify AM or PM for military time.");
-        return false;
-    }
-*/
     if (minute<0 || minute > 59) {
-        alert ("Minute must be between 0 and 59.");
+        alert ("Minuto inválido.");
         return false;
     }
-/*    if (second != null && (second < 0 || second > 59)) {
-        alert ("Second must be between 0 and 59.");
-    return false;
-    }
-*/
+
     return true;
 }
-//  End -->
