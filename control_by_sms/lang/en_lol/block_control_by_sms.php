@@ -1,5 +1,5 @@
 <?php
-	$string['pluginname'] = 'Control by SMS block';
+	$string['pluginname'] = 'Control by SMS';
 	$string['control_by_sms'] = 'Control by SMS';
 	
 	#$string['daemon_configuration'] = "<html><body><b>-Daemon Configuration-</b></body></html>";

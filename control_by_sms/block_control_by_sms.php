@@ -4,7 +4,7 @@ class block_control_by_sms extends block_base {
 
     public function init() 
     {
-    	$this->title = get_string('control_by_sms', 'block_control_by_sms');
+    	$this->title = get_string('pluginname', 'block_control_by_sms');
     }
 
     function has_config() {
