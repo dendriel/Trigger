@@ -1,5 +1,5 @@
 <?php
-$DAEMON_ADDRESS = "192.168.0.155";
+$DAEMON_ADDRESS = "172.18.91.147";
 $DAEMON_PORT = 3435;
 $server_address = 'http://' . $DAEMON_ADDRESS . ':' . $DAEMON_PORT . '/RPC2';
 
