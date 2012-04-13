@@ -30,7 +30,7 @@ if($con->statusCon() == -1) {
 // mdl_role -> moodle access level for members
 // mdl_role_assignments -> table that assigns users to levels
 // mdl_users -> table of users
-$query = "select username from mdl_user where phone2='$number' and id in (select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher'))";
+$query = "select username from mdl_user where phone2='$number' and id in (select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager'))";
 
 $val = $con->query($query);
 

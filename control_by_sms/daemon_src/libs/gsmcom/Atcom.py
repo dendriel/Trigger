@@ -1,4 +1,4 @@
- # -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 import serial
 from time import sleep
 from libs.defines.defines import *

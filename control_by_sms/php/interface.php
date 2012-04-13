@@ -158,7 +158,7 @@ function build_select_group_input()
 function mount_date($date_obj)
 {
     $date.= $date_obj->hour . ":" . $date_obj->minute;
-    $date.= " - ";
+    $date.= "_";
     $date.= $date_obj->day . "/" . $date_obj->month . "/" . $date_obj->year;
 
     return $date;
@@ -199,8 +199,7 @@ function get_requisitions($req_type)
     try {
         $client = new IXR_Client($server_address);
         
-        if (! $client->query('getRequisitions', $req_type)) {
-            echo get_string('daemon_error', 'block_control_by_sms');
+        if (!$client->query('getRequisitions', $req_type)) {
             return null;
         }
         $req_list = $client->getResponse();
@@ -208,8 +207,8 @@ function get_requisitions($req_type)
         return $req_list;
     
     } catch (Exception $e) {
-        echo get_string('daemon_error', 'block_control_by_sms'); // $e;
         return null;
     }
 }
+
 ?>

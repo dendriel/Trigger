@@ -133,6 +133,12 @@ class Manager:
         """
         Brief: Question to the GSM module for new messages and process if there are any.
         Return: None.
+        Note: The SMS format needed to be "nick;group;date time;message"
+                nick: Identification for the origin. Limited in lenght.
+                group: Shortname for a group that will be used to retrieve the destinations.
+                date time: Schedule date/time for requisition. Format: day/month hour:min - 30/12 22:30
+                message: The content of message. Can contain the Separator Characeter.
+                 ";": The separator character. Defined in the defines file.
         """
         msg_count = self.gsmcom.getMessagesCount()
         if msg_count == ERROR:
@@ -157,9 +163,8 @@ class Manager:
                 continue
 
             elif msg_req == INVALID:
-                self.log.LOG(LOG_CRITICAL, "manager.receiveService()", "Invalid requisition received. Message ID [%d]. Ignoring..." % msg_index)
+                self.log.LOG(LOG_INFO, "manager.receiveService()", "Invalid requisition received will not be registered. Message ID [%d]. Ignoring..." % msg_index)
                 self.gsmcom.deleteMessage(msg_index)
-                continue
 
             else:
                 if self.dbcom.registerRequisition(msg_req) != OK:
@@ -185,6 +190,7 @@ class Manager:
         # Create the script to validate origin and retrieve destination list #
         ret = self.validateOrigin(msg_data[DATA_ORIG])
         if ret == INVALID:
+            self.log.LOG(LOG_INFO, "manager.receiveService()", "Not allowed user trying to register new requisition.")
             return INVALID
 
         elif ret == ERROR:
@@ -194,6 +200,9 @@ class Manager:
         msg_values = self.getValuesFromMessage(msg_data[DATA_MSG])
 
         if msg_values == ERROR:
+            self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "Invalid parameters was found in the requisition.")
+            return INVALID
+        else:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
@@ -238,12 +247,16 @@ class Manager:
 
                 date_time = self.retrieveDateTime(dt_data)
                 # if date/time formt is invalid #
-                if date_time == ERROR:
+                if date_time == INVALID:
+                    self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Invalid date/time format for requisition.")
+                    return INVALID
+                elif date_time == ERROR:
                     return ERROR
+                
 
                 msg = ""
                 for index in range(MSG_P, len_values):
-                    msg+= values[MSG_P]
+                    msg+= values[index]
                     if index < len_values:
                         msg+= " " # put spaces between text words #
                 
@@ -320,8 +333,8 @@ class Manager:
         Brief: Try to retrieve date/time value from the data package.
         Param: data The package to be checked.
         Return: A timestamp corresponding to the date/time recovered
-                from the package; ERROR if the date/time forma is not
-                valid;
+                from the package; INVALID if the date/time forma is not
+                valid; ERROR if something went wrona.
         """
         DAY_MAX = 31 # TODO validate february months and leap years
         MONTH_MAX = 12
@@ -341,10 +354,13 @@ class Manager:
                     now = now.replace(hour=time[0], minute=time[1], microsecond=0)
                     return {DATA_SEND:False, DATA_BLOW:now}
         
+                elif time == INVALID:
+                    return INVALID
+
                 else:
                     return ERROR
         
-            elif dt_len == 11:
+            elif dt_len == 11: # day/month hour:minute - 10/10 21:30 
                 dt_data = dt_data.split()
                 date = dt_data[0] 
                 time = dt_data[1]
@@ -358,9 +374,12 @@ class Manager:
                     date[1] = int(date[1])
         
                     if date[0] > DAY_MAX or date[0] <= 0:
-                        return ERROR
+                        return INVALID
         
                     elif date[1] > MONTH_MAX or date[0] <= 0:
+                        return INVALID
+
+                    else:
                         return ERROR
         
                 time = self.verifyTime(time)
@@ -370,11 +389,14 @@ class Manager:
                     now = now.replace(day=date[0], month=date[1], hour=time[0], minute=time[1], microsecond=0)
                     return {DATA_SEND:False, DATA_BLOW:now}
         
+                elif time == INVALID:
+                    return INVALID
+
                 else:
                     return ERROR
         
             else:
-                return ERROR
+                return INVALID
 
         except Exception, exc:
             self.log.LOG(LOG_ERROR, "manager.retrieveDateTime()", "%s: %s" % (exc.__class__.__name__, exc))
@@ -382,9 +404,10 @@ class Manager:
     
     def verifyTime(self, dt_data):
         """
-        Brief:
-        Param: dt_data
-        Return:
+        Brief: Verifies if the time is correctly formated
+        Param: dt_data The time string to be validated
+        Return: INVALID if the time is invalid; ERROR if something is wrong;
+                the time if everything is OK.
         """
         HOUR_MAX = 23
         MIN_MAX = 59
@@ -399,10 +422,10 @@ class Manager:
                 time[1] = int(time[1])
         
                 if time[0] > HOUR_MAX:
-                    return ERROR
+                    return INVALID
         
                 elif time[1] > MIN_MAX:
-                    return ERROR
+                    return INVALID
         
                 else:
                     return time

@@ -201,7 +201,7 @@ class trigger:
 #---------------------------------------------------------#
 if __name__ == "__main__":
 
-    bind_address = "172.18.91.147"
+    bind_address = "127.0.0.1"
     bind_port = SYSTEM_PORT
     system = trigger(bind_address, bind_port, GSM_ATCOM)
     system.start()

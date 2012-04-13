@@ -5,11 +5,6 @@ include('./php/defines.php');
 include('./php/interface.php');
 include("./lang/en/block_control_by_sms.php");
 
-$active_b = get_string('active', 'block_control_by_sms');
-$canceled_b = get_string('canceled', 'block_control_by_sms');
-$failed_b = get_string('failed', 'block_control_by_sms');
-$sent_b = get_string('sent', 'block_control_by_sms');
-
 $active_b = $string['active'];
 $canceled_b = $string['canceled'];
 $failed_b = $string['failed'];
@@ -101,7 +96,7 @@ th {
 }
 td {
     border-width: 1px;
-    padding: 22x;
+    padding: 5px;
     border-style: dotted;
     border-color: gray;
     -moz-border-radius: ;
@@ -118,14 +113,15 @@ $page.= "</h1>";
 $page.= "<div align=\"center\">";
 $page.= "<table border=\"2\">";
 $page.= "<tr>";
-$page.= "<td><a href=\"reports.php?req_type=$ACTIVE\">$active_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$CANCELED\">$canceled_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$FAILED\">$failed_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$SENT\">$sent_b</a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$ACTIVE\"><u>$active_b</u></u></a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$CANCELED\"><u>$canceled_b</u></a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$FAILED\"><u>$failed_b</u></a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$SENT\"><u>$sent_b</u></a></td>";
 $page.= "</tr>";
 $page.= "</table></div>";
 
-$page.= "<h2 align=\"center\"><u>$header2</u></h2>";
+$page.= "<h2 align=\"center\" ><u>$header2</u></h2>";
+#$page.= "<h2 align=\"center\" ><span style=\"color:$th_color\">$header2</span></h2>"; // colored title mode //
 
 $table.= "<div align=\"center\">";
 $table.= "<table border=\"1\">";
