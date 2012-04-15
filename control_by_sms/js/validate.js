@@ -66,19 +66,19 @@ function isDate(dtStr){
         return false
     }
     if (strDay.length<1 || day<1 || day>31 || (month==2 && day>daysInFebruary(year)) || day > daysInMonth[month]){
-        alert("Entre com um dia válido.")
+        alert("Entre com um dia valido.")
         return false
     }
     if (strMonth.length<1 || month<1 || month>12){
-        alert("Entre com um mês válido.")
+        alert("Entre com um mês valido.")
         return false
     }
     if (strYear.length != 4 || year==0 || year<minYear || year>maxYear){
-        alert("Entre com um ano válido de quatro dígitos. Ano máximo: " + maxYear)
+        alert("Entre com um ano valido de quatro digitos. Ano maximo: " + maxYear)
         return false
     }
     if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
-        alert("Entre com uma data válida.")
+        alert("Entre com uma data valida.")
         return false
     }
 return true
@@ -113,7 +113,7 @@ function isValidTime(timeStr)
     var matchArray = timeStr.match(timePat);
 
     if (matchArray == null) {
-        alert("A hora está em um formato inválido.");
+        alert("A hora está em um formato invalido.");
         return false;
     }
     hour = matchArray[1];

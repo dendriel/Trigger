@@ -96,7 +96,7 @@ function validateForm()
         return false;
 
     } else if (document.sms_service.message.value.length == 0) {
-        alert('O campo da mensagem não pode estar vazio!');
+        alert('O campo da mensagem nao pode estar vazio!');
         return false;
 
     // if sms action is schedule, we need date/time parameters //
