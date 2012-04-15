@@ -46,14 +46,12 @@ function DaysArray(n) {
 function isDate(dtStr){
 
     var daysInMonth = DaysArray(12)
-    var pos1=dtStr.indexOf(dtCh)
-    var pos2=dtStr.indexOf(dtCh,pos1+1)
-    var strDay=dtStr.substring(0,pos1)
-    var strMonth=dtStr.substring(pos1+1,pos2)
-//    var strMonth=dtStr.substring(0,pos1)
-//    var strDay=dtStr.substring(pos1+1,pos2)
-    var strYear=dtStr.substring(pos2+1)
-    strYr=strYear
+    var pos1 = dtStr.indexOf(dtCh)
+    var pos2 = dtStr.indexOf(dtCh,pos1+1)
+    var strDay = dtStr.substring(0,pos1)
+    var strMonth = dtStr.substring(pos1+1,pos2)
+    var strYear = dtStr.substring(pos2+1)
+    strYr = strYear
 
     if (strDay.charAt(0)=="0" && strDay.length>1) strDay=strDay.substring(1)
     if (strMonth.charAt(0)=="0" && strMonth.length>1) strMonth=strMonth.substring(1)
@@ -64,23 +62,23 @@ function isDate(dtStr){
     day=parseInt(strDay)
     year=parseInt(strYr)
     if (pos1==-1 || pos2==-1){
-        alert("The date format should be : dd/mm/yyyy")
-        return false
-    }
-    if (strMonth.length<1 || month<1 || month>12){
-        alert("Please enter a valid month")
+        alert("O formato da data deve ser: dia/mes/ano")
         return false
     }
     if (strDay.length<1 || day<1 || day>31 || (month==2 && day>daysInFebruary(year)) || day > daysInMonth[month]){
-        alert("Please enter a valid day")
+        alert("Entre com um dia válido.")
+        return false
+    }
+    if (strMonth.length<1 || month<1 || month>12){
+        alert("Entre com um mês válido.")
         return false
     }
     if (strYear.length != 4 || year==0 || year<minYear || year>maxYear){
-        alert("Please enter a valid 4 digit year between "+minYear+" and "+maxYear)
+        alert("Entre com um ano válido de quatro dígitos. Ano máximo: " + maxYear)
         return false
     }
     if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
-        alert("Please enter a valid date")
+        alert("Entre com uma data válida.")
         return false
     }
 return true
@@ -110,51 +108,32 @@ function valButton(btn) {
 */
 function isValidTime(timeStr)
 {
-// Checks if time is in HH:MM:SS AM/PM format.
-// The seconds and AM/PM are optional.
     var timePat = /^(\d{1,2}):(\d{2})?$/;
-    //var timePat = /^(\d{1,2}):(\d{2})(:(\d{2}))?(\s?(AM|am|PM|pm))?$/;
     
     var matchArray = timeStr.match(timePat);
 
     if (matchArray == null) {
-        alert("Time is not in a valid format.");
+        alert("A hora está em um formato inválido.");
         return false;
     }
     hour = matchArray[1];
     minute = matchArray[2];
     second = "00";
-    //second = matchArray[4];
     ampm = null;
-    //ampm = matchArray[6];
     
     if (second=="") { second = null; }
     if (ampm=="") { ampm = null }
     
     if (hour < 0  || hour > 23) {
-        alert("Hour must be between 0 and 23.");
+        alert("Entre com uma hora entre 00 e 23.");
         return false;
     }
-/*    if (hour <= 12 && ampm == null) {
-        if (confirm("Please indicate which time format you are using.  OK = Standard Time, CANCEL = Military Time")) {
-            alert("You must specify AM or PM.");
-            return false;
-       }
-    }
-    if  (hour > 12 && ampm != null) {
-        alert("You can't specify AM or PM for military time.");
-        return false;
-    }
-*/
+
     if (minute<0 || minute > 59) {
-        alert ("Minute must be between 0 and 59.");
+        alert ("Entre com minutos entre 0 e 59.");
         return false;
     }
-/*    if (second != null && (second < 0 || second > 59)) {
-        alert ("Second must be between 0 and 59.");
-    return false;
-    }
-*/
+
     return true;
 }
 //  End -->
