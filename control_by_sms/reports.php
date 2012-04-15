@@ -145,7 +145,7 @@ if ($req_list != null) {
         $table.= "</tr>";
     }
 } else {
-    echo $string['daemon_error'];
+    //echo $string['daemon_error']; // is not an error.
 }
 
 $table.= "</table></div>";

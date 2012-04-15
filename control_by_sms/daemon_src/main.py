@@ -126,7 +126,7 @@ class trigger:
             self.log.LOG(LOG_ERROR, "system.start.configureXMLRPCServer()", "Failed to configure XML-RPC Server parameters. %s: %s" % (exc.__class__.__name__, exc))
             exit(-1)
 
-    def newRequisition(self, orig, destn, msg, oper, send, blow):
+    def newRequisition(self, orig, destn, msg, oper, send, blow, orig_ext):
         """
         Brief: Treat data and try to insert new register into the database.
         Param: orig The name that identifies the origin;
@@ -143,7 +143,9 @@ class trigger:
                          DATA_MSG: msg,\
                          DATA_OPER: oper,\
                          DATA_SEND: send,\
-                         DATA_BLOW: blow}
+                         DATA_BLOW: blow,\
+                         DATA_EXTEN: orig_ext,\
+                         DATA_SRC: XML}
 
             if self.dbcom.registerRequisition(data_dict) == OK:
                 self.log.LOG(LOG_INFO, "system", "New requisition from RPC was registered.")

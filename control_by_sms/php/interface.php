@@ -95,7 +95,7 @@ function build_table_buttons()
  * Brief: Build form that will receive message and 
  *      options.
  */
-function build_input_form($origin)
+function build_input_form($origin, $user_id)
 {
     global $string;
     $form.= "<table>";
@@ -127,6 +127,7 @@ function build_input_form($origin)
     $form.= "</table>";
 
     $form.= "<tr><td style=\"border-style:none;text-align:center;\">";
+    $form.= "<input type=\"hidden\" name=\"user_id2\" value=\"$user_id\">";
     $form.= "<input type=\"submit\" value=\"".$string['register'] . "\">";
     $form.= "</td></tr>";
 
@@ -138,7 +139,7 @@ function build_input_form($origin)
 /********************************************************
  * Brief: Build input field that will recover groups list.
  */
-function build_select_group_input() 
+function build_select_group_input($user_id) 
 {
     global $string;
     $form.= "<div style=\"text-align:center;\">";
@@ -146,6 +147,7 @@ function build_select_group_input()
     $form.= $string['retrieve_dest_title'] . ":<br />";
     $form.= "<input name=\"course_group\" type=\"text\" maxlength=10>";
     $form.= "<input type=\"submit\" value=\"" . $string['retrieve_dest_buttom'] . "\">";
+    $form.= "<input type=\"hidden\" name=\"user_id2\" value=\"$user_id\">";
     $form.= "</form>";
     $form.= "</div>";
 

@@ -87,6 +87,7 @@ function selectAllOptions(select_box)
  */
 function validateForm()
 {
+    document.alert('validating')
     var date = document.sms_service.date;
     var time = document.sms_service.time;
     var sms_action = valButton(sms_service.sms_action);

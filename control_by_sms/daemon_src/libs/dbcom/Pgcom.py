@@ -94,9 +94,9 @@ class Pgcom(DatabaseTemplate):
         try:
             if self.__connect() == OK:
                 query = "INSERT INTO %s\
-                 (orig, dest, msg, oper, send, blow, stat) VALUES\
-                 ('%s', '%s', '%s', %d, '%s', '%s', %d)"\
-                 % (TABLE_SMS, data[DATA_ORIG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_SEND], data[DATA_BLOW], ACTIVE)
+                 (orig, dest, msg, oper, send, blow, ext, src, stat) VALUES\
+                 ('%s', '%s', '%s', %d, '%s', '%s', '%s', %d, %d)"\
+                 % (TABLE_SMS, data[DATA_ORIG], data[DATA_DESTN], data[DATA_MSG], data[DATA_OPER], data[DATA_SEND], data[DATA_BLOW], data[DATA_EXTEN], data[DATA_SRC], ACTIVE)
                 self.__query(query)
     
                 if self.__disconnect() == ERROR:
@@ -240,8 +240,10 @@ class Pgcom(DatabaseTemplate):
                      %s BOOLEAN,\
                      %s TIMESTAMP,\
                      %s INT,\
+                     %s INT,\
+                     %s CHARACTER VARYING(8),\
                      %s SERIAL PRIMARY KEY\
-                );" % (TABLE_SMS, DATA_ORIG, DATA_DESTN, DATA_MSG, DATA_OPER, DATA_SEND, DATA_BLOW, DATA_STATUS, DATA_ID)
+                );" % (TABLE_SMS, DATA_ORIG, DATA_DESTN, DATA_MSG, DATA_OPER, DATA_SEND, DATA_BLOW, DATA_STATUS, DATA_SRC, DATA_EXTEN, DATA_ID)
 
                 self.cursor.execute(query)
                 return OK
