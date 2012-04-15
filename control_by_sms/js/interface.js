@@ -87,17 +87,16 @@ function selectAllOptions(select_box)
  */
 function validateForm()
 {
-    document.alert('validating')
     var date = document.sms_service.date;
     var time = document.sms_service.time;
     var sms_action = valButton(sms_service.sms_action);
 
     if (selectAllOptions('destination_users_select') == false) {
-        alert('No destinations are selected!');
+        alert('Nenhum destino selecionado!');
         return false;
 
     } else if (document.sms_service.message.value.length == 0) {
-        alert('You need to add some text to the body message!');
+        alert('O campo da mensagem não pode estar vazio!');
         return false;
 
     // if sms action is schedule, we need date/time parameters //

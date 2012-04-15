@@ -81,7 +81,7 @@
  $string['instant_sms'] = "Enviar agora";
  $string['schedule_sms'] = "Agendar SMS";
  $string['max_text_length'] = "M&aacute;x.149 caracteres.";
- $string['input_date'] = "Data";
+ $string['input_date'] = "Data [dd/mm/aaaa]";
  $string['input_time'] = "Hora [hh:mm]";
  $string['register'] = "Enviar dados";
  $string['retrieve_dest_title'] = "Insira um grupo de destino";
