@@ -51,6 +51,8 @@
  $string['failed'] = "Falhos";
  $string['sent'] = "Enviados";
  $string['reports_title'] = "Relatórios";
+ $string['source'] = "Fonte";
+ $string['extension'] = "ExtensÃ£o";
 
 // Reports Colors //
  $string['green_header'] = "6c9";

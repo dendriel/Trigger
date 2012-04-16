@@ -20,4 +20,6 @@ $BLOW  = 1;
 $ORIG  = 3;
 $MSG   = 4;
 $DESTN = 5;
+$SRC   = 6;
+$EXTEN = 7;
 ?>

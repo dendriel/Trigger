@@ -121,7 +121,12 @@ class Pgcom(DatabaseTemplate):
         Return: An list with the ocurrence of the specified requisition status.
         """
         if self.__connect() == OK:
-            query = "SELECT %s,%s,%s,%s,%s,%s FROM %s WHERE stat=%d" % (DATA_ID, DATA_BLOW, DATA_SEND, DATA_ORIG, DATA_MSG, DATA_DESTN, TABLE_SMS, status)
+            query = "SELECT %s,%s,%s,%s,%s,%s,%s,%s\
+                     FROM %s\
+                     WHERE stat=%d" %\
+                     (DATA_ID, DATA_BLOW, DATA_SEND, DATA_ORIG, DATA_MSG, DATA_DESTN, DATA_SRC, DATA_EXTEN,\
+                     TABLE_SMS,\
+                     status)
             ret = self.__query(query)
             self.__disconnect()
             return ret

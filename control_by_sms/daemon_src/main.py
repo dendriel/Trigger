@@ -138,14 +138,16 @@ class trigger:
         Return: OK(0) if could register the requisition; ERROR(-1) otherwise.
         """
         try:
-            data_dict = {DATA_ORIG: orig,\
+            data_dict = {
+                         DATA_ORIG:  orig,\
                          DATA_DESTN: destn,\
-                         DATA_MSG: msg,\
-                         DATA_OPER: oper,\
-                         DATA_SEND: send,\
-                         DATA_BLOW: blow,\
+                         DATA_MSG:   msg,\
+                         DATA_OPER:  oper,\
+                         DATA_SEND:  send,\
+                         DATA_BLOW:  blow,\
                          DATA_EXTEN: orig_ext,\
-                         DATA_SRC: XML}
+                         DATA_SRC:   XML\
+                        }
 
             if self.dbcom.registerRequisition(data_dict) == OK:
                 self.log.LOG(LOG_INFO, "system", "New requisition from RPC was registered.")

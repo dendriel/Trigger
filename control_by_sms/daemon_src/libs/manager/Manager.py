@@ -199,10 +199,11 @@ class Manager:
 
         msg_values = self.getValuesFromMessage(msg_data[DATA_MSG])
 
-        if msg_values == ERROR:
+        if msg_values == INVALID:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "Invalid parameters was found in the requisition.")
             return INVALID
-        else:
+
+        elif msg_values == ERROR:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
@@ -210,22 +211,26 @@ class Manager:
 
         try:
             req_dict = {
-                        DATA_MSG: msg_values[DATA_MSG],\
-                        DATA_ORIG:msg_values[DATA_ORIG],\
-                        DATA_SEND:msg_values[DATA_SEND],\
-                        DATA_BLOW:msg_values[DATA_BLOW],\
-                        DATA_DESTN:dest_list,\
-                        DATA_OPER:VIVO\
-                        }
+                        DATA_ORIG:  msg_values[DATA_ORIG],\
+                        DATA_DESTN: dest_list,\
+                        DATA_MSG:   msg_values[DATA_MSG],\
+                        DATA_OPER:  VIVO,\
+                        DATA_SEND:  msg_values[DATA_SEND],\
+                        DATA_BLOW:  msg_values[DATA_BLOW],\
+                        DATA_EXTEN: msg_data[DATA_ORIG],\
+                        DATA_SRC:   GSM\
+                       }
+
         except Exception, exc:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
+        self.log.LOG(content=req_dict)
         return req_dict
 
     def getValuesFromMessage(self, message_body):
         """
-        Brief: Retrieve the values from the message if he is consistent.
+        Brief: Retrieve the values from the message if is consistent.
         Param: msg_data The body text from the message.
         Return: A dict with data from the requisition;
                 ERROR if something went wrong.
@@ -250,7 +255,9 @@ class Manager:
                 if date_time == INVALID:
                     self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Invalid date/time format for requisition.")
                     return INVALID
+
                 elif date_time == ERROR:
+                    self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Error retrieving date/time for requisition.")
                     return ERROR
                 
 
@@ -265,9 +272,6 @@ class Manager:
             else:
                 self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Message body is not correctly formated. Values Length: %d" % len(values))
                 return ERROR
-                    
-                    
-            # TODO try to recover a date/time value; if was not possible, add the field to the message
             
         except Exception, exc:
             self.log.LOG(LOG_ERROR, "manager.getValuesFromMessage()", "Error while mounting dictionary. %s: %s" % (exc.__class__.__name__, exc))
@@ -338,12 +342,12 @@ class Manager:
         """
         DAY_MAX = 31 # TODO validate february months and leap years
         MONTH_MAX = 12
-    
+
         try:
             dt_len = len(dt_data)
         
             if dt_len == 0:
-                    return {DATA_SEND:True, DATA_BLOW:datetime.now()}
+                return {DATA_SEND:True, DATA_BLOW:datetime.now()}
           
             elif dt_len == 5: # expect hour:min ~ ex.: 16:40 #
         
@@ -379,9 +383,6 @@ class Manager:
                     elif date[1] > MONTH_MAX or date[0] <= 0:
                         return INVALID
 
-                    else:
-                        return ERROR
-        
                 time = self.verifyTime(time)
         
                 if time != ERROR:

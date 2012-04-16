@@ -127,9 +127,11 @@ $table.= "<div align=\"center\">";
 $table.= "<table border=\"1\">";
 
 $table.= "<tr style=\"background-color:$tr_color;\">";
+$table.= "<th>" . $string['source'] . "</th>";
+$table.= "<th>" . $string['blow_col'] . "</th>";
+$table.= "<th>" . $string['extension'] . "</th>";
 $table.= "<th>" . $string['origin_col'] . "</th>";
 $table.= "<th>" . $string['message_col'] . "</th>";
-$table.= "<th>" . $string['blow_col'] . "</th>";
 $table.= "<th>" . $string['destination_col'] . "</th>";
 $table.= "</tr>";
 
@@ -137,10 +139,14 @@ $table.= "</tr>";
 if ($req_list != null) {
 
     for ($index=0; $index < count($req_list); $index++) {
+
         $table.= "<tr style=\"background-color:$th_color\">";
+        if($req_list[$index][$SRC] == '10') $source = "WEB"; else $source = "GSM";
+        $table.= "<td>" . $source . "</td>";
+        $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
+        $table.= "<td>" . $req_list[$index][$EXTEN] . "</td>";
         $table.= "<td>" . $req_list[$index][$ORIG] . "</td>";
         $table.= "<td>" . treat_str($req_list[$index][$MSG]) . "</td>";
-        $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
         $table.= "<td>" . treat_str($req_list[$index][$DESTN]) . "</td>";
         $table.= "</tr>";
     }
