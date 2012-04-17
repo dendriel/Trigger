@@ -231,4 +231,40 @@ function get_system_log()
     }
 }
 
+function clean_log_button($name)
+{
+    $form.= "<form action=\"logs.php\" method=\"post\">";
+    $form.= "<input type=\"checkbox\" name=\"clean_logs\" value=\"1\" />";
+    $form.= "<input type=\"submit\" value=\"$name\">";
+    $form.= "</form>";
+
+    return $form;
+}
+
+function do_clean_logs()
+{
+    global $server_address;
+    global $TRUE;
+
+    try {
+        $client = new IXR_Client($server_address);
+        
+        if (!$client->query('cleanLogs')) {
+            return $string['daemon_error'];
+        }
+        $ans = $client->getResponse();
+    
+        if($ans == $TRUE) {
+           return $string['do_clean_logs_ok'];
+
+        } else {
+           return $string['do_clean_logs_false'];
+        }
+    
+    } catch (Exception $e) {
+        return null;
+    }
+
+}
+
 ?>

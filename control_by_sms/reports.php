@@ -51,6 +51,7 @@ $req_type = (int)$_GET['req_type'];
 if(($req_type) >= 0 or ($req_type <=3)) {
 
     $req_list = get_requisitions($req_type);
+
     switch($req_type) {
 
         case $ACTIVE: 

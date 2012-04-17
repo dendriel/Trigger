@@ -13,6 +13,9 @@
  $string['system_logs_menu'] = "Registros";
  $string['footnote'] = "Desenvolvido por Vitor Rozsa";
  $string['service_stopped'] = "Servi&ccedil;o interrompido. Entre em contato com o administrador para mais inform&ccedil;&otilde;es.";
+ $string['clean_logs'] = "Apagar logs";
+ $string['do_clean_logs_ok'] = "Registros apagados!";
+ $string['do_clean_logs_false'] = "Registros n&atilde;o puderam ser apagados.";
 
 // Status Strings //
  $string['conection_failed'] = "<div style=\"border-style:solid;

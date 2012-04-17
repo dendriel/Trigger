@@ -46,9 +46,9 @@ class Manager:
         """
         while(True):
 
-            self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
+            #self.log.LOG(LOG_INFO, "manager", "Executing sendService()...")
             self.sendService()
-            self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
+            #self.log.LOG(LOG_INFO, "manager", "Executing receiveService()...")
             self.receiveService()
             time.sleep(MNGR_THRD_SLEEP)
 
@@ -108,23 +108,26 @@ class Manager:
         message += ": " 
         message += data_dict[DATA_MSG]
 
+        ret = OK 
         for destination in data_dict[DATA_DESTN]:
-            ret = OK 
 
             if self.gsmcom.sendSMS(destination, message) == OK:
                 self.log.LOG(LOG_INFO, "manager", "SMS sent to destination: %s" % destination)
             else:
+                self.log.LOG(LOG_ERROR, "manager", "SMS was not sent to destination: %s" % destination)
                 ret = ERROR
 
         if ret == OK:
             req_state = SENT
+            self.log.LOG(LOG_INFO, "manager", "Requisition successful completed!")
         else:
             req_state = FAILED
+            self.log.LOG(LOG_INFO, "manager", "Requisition failed!")
 
         if self.dbcom.changeRequisitionStatus(req_id, req_state) == ERROR:
             self.log.LOG(LOG_CRITICAL, "manager.compĺeteRequisition()", "Failed to change requisition status. Requisiton id=\"%d\"" % req_id)
         else:
-            self.log.LOG(LOG_INFO, "manager.completeRequisition()", "Requisiton status changed to SENT. Requisiton id=\"%d\"" % req_id)
+            self.log.LOG(LOG_INFO, "manager.completeRequisition()", "Requisiton status changed. Requisiton id=\"%d\"" % req_id)
 
         return
 
@@ -224,7 +227,6 @@ class Manager:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "%s: %s" % (exc.__class__.__name__, exc))
             return ERROR
 
-        self.log.LOG(content=req_dict)
         return req_dict
 
     def getValuesFromMessage(self, message_body):
@@ -290,8 +292,6 @@ class Manager:
             val.wait()
             destn = open(fstream, "r").read()
             destn = destn
-
-            self.log.LOG(content=destn)
 
             if destn == VAL_NUM_MISSING:
                 return INVALID

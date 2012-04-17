@@ -41,6 +41,7 @@ class trigger:
         """
         Brief: Call all necessary functions and goes into the connection loop.
         """
+        self.log.LOG(LOG_INFO, "system", "+========================================================================")
         self.log.LOG(LOG_INFO, "system.start()", "Starting the system...")
 
         # Configure parameters and functions into XML-RPC Server #
@@ -117,6 +118,7 @@ class trigger:
             self.xmlrpc_server.register_function(self.newRequisition)
             self.xmlrpc_server.register_function(self.getRequisitions)
             self.xmlrpc_server.register_function(self.getLogs)
+            self.xmlrpc_server.register_function(self.cleanLogs)
             self.xmlrpc_server.register_function(self.pingDaemon)
             #self.xmlrpc_server.register_function(self.systemHalt)
             self.xmlrpc_server.register_introspection_functions()
@@ -186,6 +188,16 @@ class trigger:
 
         except:
             return "Failed to access the log file."
+
+    def cleanLogs(self):
+        """
+        Brief: Clean the file log.
+        Return: OK if everything whent fine; ERROR otherwise.
+        """
+        if self.log.CLEAN(SYSTEM_LOG_PATH) == OK:
+            return OK
+        else:
+            return ERROR
 
     def pingDaemon(self):
         """

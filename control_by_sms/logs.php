@@ -41,7 +41,6 @@ if ($user_id != null) {
     $con->close();
 }
 
-
 $page.= "<html><head>";
 $page.= "<title>Control By SMS" . $string['logs_title'] ." - Registros do Sistema</title>";
 $page.= "<LINK REL=StyleSheet HREF=\"/moodle/theme/standard/style/core.css\" TYPE=\"text/css\" MEDIA=screen>";
@@ -52,11 +51,17 @@ $page.= "<h1 align=\"center\">";
 $page.= $string['logs_title'];
 $page.= "</h1>";
 
+$page.= clean_log_button($string['clean_logs']);
+
+if($_POST['clean_logs'] == '1') {
+    do_clean_logs();
+}
 
 $page.= "<div align=\"center\">";
 $page .= "<textarea disabled=\"disabled\" rows=\"30\" cols=\"95\">" . get_system_log() . "</textarea>";
 $page.= "</div>";
 $page .= "</body></html>";
+
 echo $page;
 
 ?>

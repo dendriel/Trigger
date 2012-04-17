@@ -168,7 +168,7 @@ class Atcom(GsmTemplate):
         # Confirm the command #
         self._send("\032")
         # Clear the command from the buffer #
-        self.read()
+        self._read()
         # Delay to wait the answer #
         sleep(SEND_SMS_DELAY)
 
@@ -178,11 +178,11 @@ class Atcom(GsmTemplate):
         try:
             answer = answer.split()
             if len(answer) == EXPECTED_ANSWER_LEN:
-                if int(answer[2]) == AT_OK:
+                if answer[2] == AT_OK:
                     return OK
                 else:
                     self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. AT command content: %s" % answer)
-                    return INVALID
+                    return ERROR
 
         except Exception, exc:
             self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "%s: %s" % (exc.__class__.__name__, exc))
