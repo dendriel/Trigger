@@ -111,11 +111,10 @@ class Manager:
         for destination in data_dict[DATA_DESTN]:
             ret = OK 
 
-            if self.gsmcom.sendSMS(destination, message) != OK:
+            if self.gsmcom.sendSMS(destination, message) == OK:
+                self.log.LOG(LOG_INFO, "manager", "SMS sent to destination: %s" % destination)
+            else:
                 ret = ERROR
-
-            self.log.LOG(LOG_INFO, "manager", "SMS sent to destination: %s" % destination)
-                
 
         if ret == OK:
             req_state = SENT

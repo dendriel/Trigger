@@ -154,6 +154,8 @@ class Atcom(GsmTemplate):
         Return: OK if the alarm was sent; ERROR in whatever
               other case.
         """
+        EXPECTED_ANSWER_LEN = 3
+
         if self._open_port() == ERROR:
             return ERROR
 
@@ -165,16 +167,26 @@ class Atcom(GsmTemplate):
         self._send("%s" % content)
         # Confirm the command #
         self._send("\032")
-
+        # Clear the command from the buffer #
+        self.read()
+        # Delay to wait the answer #
         sleep(SEND_SMS_DELAY)
+
         answer = self._read()
         self._close_port()
+        # treat answer #
+        try:
+            answer = answer.split()
+            if len(answer) == EXPECTED_ANSWER_LEN:
+                if int(answer[2]) == AT_OK:
+                    return OK
+                else:
+                    self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. AT command content: %s" % answer)
+                    return INVALID
 
-        # TODO this verification does not really work
-        #if answer.find(AT_ERROR_ST) >= OK:
-        #    self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "Failed to send message. Answer Content: %s" % answer)
-        #    return INVALID
-        return OK
+        except Exception, exc:
+            self.log.LOG(LOG_ERROR, "gsmcom.sendSMS()", "%s: %s" % (exc.__class__.__name__, exc))
+            return ERROR
 
     def getAllNewMessages(self):
         """
