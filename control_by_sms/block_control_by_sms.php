@@ -40,15 +40,14 @@ class block_control_by_sms extends block_base {
             $schedule_sms.= get_string('reports_menu', 'block_control_by_sms');
             $schedule_sms.= '</a></b></div>';
             $schedule_sms.= '</tr>';
-    
-            // Configure //   
-/*            $schedule_sms.= '<tr>';
+            // Logs //   
+            $schedule_sms.= '<tr>';
             $schedule_sms.= '<div style="text-align:center;"><b>';
-            $schedule_sms.= '<a href="javascript: configure_feature()">';
-            $schedule_sms.= 'Configure';
+            $schedule_sms.= '<a href="javascript: system_logs()">';
+            $schedule_sms.= get_string('system_logs_menu', 'block_control_by_sms');
             $schedule_sms.= '</a></b></div>';
             $schedule_sms.= '</tr>';
-*/
+
         } else {
             $schedule_sms.= '<tr>';
             $schedule_sms.= '<div style="text-align:center;"><b>';
@@ -75,8 +74,11 @@ class block_control_by_sms extends block_base {
         $w_height = 500;
         $w_width = 600;
 
-        $w_height_r = 500;
-        $w_width_r = 830;
+        $w_height_r = 600;
+        $w_width_r = 930;
+
+        $w_height_l = 600;
+        $w_width_l = 800;
 
     	$course_id = $COURSE->id;
         $user_id = $USER->id;
@@ -89,12 +91,12 @@ class block_control_by_sms extends block_base {
     	$js.= "window.open('/moodle/blocks/control_by_sms/schedule_sms.php?course_id=$course_id&user_id=$user_id','','scrollbars=no,menubar=no,height=$w_height,width=$w_width,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.=  "}\n";
 
-        $js.= "function configure_feature() {\n";
-        $js.= "window.open('/moodle/blocks/control_by_sms/configure_sms.php','','scrollbars=no,menubar=no,height=500,width=800,resizable=no,toolbar=no,location=no,status=no'); \n";
-        $js.= "}\n";
-
     	$js.= "function open_reports() {\n";
     	$js.= "window.open('/moodle/blocks/control_by_sms/reports.php?req_type=$req_type&user_id=$user_id','','scrollbars=no,menubar=no,height=$w_height_r,width=$w_width_r,resizable=no,toolbar=no,location=no,status=no'); \n";
+        $js.= "}\n";
+
+        $js.= "function system_logs() {\n";
+    	$js.= "window.open('/moodle/blocks/control_by_sms/logs.php?user_id=$user_id','','scrollbars=no,menubar=no,height=$w_height_l,width=$w_width_l,resizable=no,toolbar=no,location=no,status=no'); \n";
         $js.= "}\n";
 
     	$js.= "</script>\n";

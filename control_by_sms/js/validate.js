@@ -62,23 +62,23 @@ function isDate(dtStr){
     day=parseInt(strDay)
     year=parseInt(strYr)
     if (pos1==-1 || pos2==-1){
-        alert("O formato da data deve ser: dia/mes/ano")
+        alert("O formato da data deve ser: dia/m\u00EAs/ano")
         return false
     }
     if (strDay.length<1 || day<1 || day>31 || (month==2 && day>daysInFebruary(year)) || day > daysInMonth[month]){
-        alert("Entre com um dia valido.")
+        alert("Entre com um dia v\u00E1lido.")
         return false
     }
     if (strMonth.length<1 || month<1 || month>12){
-        alert("Entre com um mês valido.")
+        alert("Entre com um m\u00EAs v\u00E1lido.")
         return false
     }
     if (strYear.length != 4 || year==0 || year<minYear || year>maxYear){
-        alert("Entre com um ano valido de quatro digitos. Ano maximo: " + maxYear)
+        alert("Entre com um ano v\u00E1lido de quatro digitos. Ano m\u00E1ximo: " + maxYear)
         return false
     }
     if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
-        alert("Entre com uma data valida.")
+        alert("Entre com uma data v\u00E1lida.")
         return false
     }
 return true
@@ -113,7 +113,7 @@ function isValidTime(timeStr)
     var matchArray = timeStr.match(timePat);
 
     if (matchArray == null) {
-        alert("A hora está em um formato invalido.");
+        alert("A hora est\u00E1 em um formato inv\u00E1lido.");
         return false;
     }
     hour = matchArray[1];

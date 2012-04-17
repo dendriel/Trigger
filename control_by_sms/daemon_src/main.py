@@ -116,6 +116,7 @@ class trigger:
             self.xmlrpc_server = SimpleXMLRPCServer((self.address, self.port))
             self.xmlrpc_server.register_function(self.newRequisition)
             self.xmlrpc_server.register_function(self.getRequisitions)
+            self.xmlrpc_server.register_function(self.getLogs)
             self.xmlrpc_server.register_function(self.pingDaemon)
             #self.xmlrpc_server.register_function(self.systemHalt)
             self.xmlrpc_server.register_introspection_functions()
@@ -169,6 +170,22 @@ class trigger:
         """
         req_list = self.dbcom.getRequisitions(status)
         return req_list
+
+    def getLogs(self):
+        """
+        Brief: Recover and return the system log output.
+        Return: A string with all the system.log file content or
+                an ERROR message if was not possible to access
+                the log file.
+        """
+        try:
+            log = open(SYSTEM_LOG_PATH, "r")
+            log_content = log.read()
+            log.close()
+            return log_content
+
+        except:
+            return "Failed to access the log file."
 
     def pingDaemon(self):
         """

@@ -92,11 +92,11 @@ function validateForm()
     var sms_action = valButton(sms_service.sms_action);
 
     if (selectAllOptions('destination_users_select') == false) {
-        alert('Nenhum destino selecionado!');
+        alert('Nenhum destino foi selecionado!');
         return false;
 
     } else if (document.sms_service.message.value.length == 0) {
-        alert('O campo da mensagem nao pode estar vazio!');
+        alert('O campo da mensagem n\u00E3o pode estar vazio!');
         return false;
 
     // if sms action is schedule, we need date/time parameters //

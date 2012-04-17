@@ -213,4 +213,22 @@ function get_requisitions($req_type)
     }
 }
 
+function get_system_log()
+{
+    global $server_address;
+    try {
+        $client = new IXR_Client($server_address);
+        
+        if (!$client->query('getLogs')) {
+            return null;
+        }
+        $logs = $client->getResponse();
+    
+        return $logs;
+    
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 ?>
