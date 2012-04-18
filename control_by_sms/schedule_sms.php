@@ -54,7 +54,10 @@ if ($user_id != null) {
         $origin = pg_fetch_row($origin);
         $origin = $origin[0];
     }
-} 
+} else { 
+    echo $string['not_allowed'];
+    exit(0);
+}
 
 if($_GET['course_group'] != null) {
 

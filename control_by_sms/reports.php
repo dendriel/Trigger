@@ -44,6 +44,10 @@ if ($user_id != null) {
         }
     }
     $con->close();
+
+} else {
+    echo $string['not_allowed'];
+    exit(0);
 }
 
 $req_type = (int)$_GET['req_type'];

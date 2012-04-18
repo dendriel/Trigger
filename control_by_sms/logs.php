@@ -39,6 +39,10 @@ if ($user_id != null) {
         }
     }
     $con->close();
+
+} else {
+    echo $string['not_allowed'];
+    exit(0);
 }
 
 $page.= "<html><head>";
