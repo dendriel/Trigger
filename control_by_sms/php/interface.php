@@ -231,9 +231,10 @@ function get_system_log()
     }
 }
 
-function clean_log_button($name)
+function clean_log_button($name, $user_id)
 {
-    $form.= "<form action=\"logs.php\" method=\"post\">";
+    $form.= "<form action=\"logs.php\" method=\"get\">";
+    $form.= "<input type=\"hidden\" name=\"user_id\" value=\"$user_id\">";
     $form.= "<input type=\"checkbox\" name=\"clean_logs\" value=\"1\" />";
     $form.= "<input type=\"submit\" value=\"$name\">";
     $form.= "</form>";

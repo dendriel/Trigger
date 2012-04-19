@@ -55,9 +55,9 @@ $page.= "<h1 align=\"center\">";
 $page.= $string['logs_title'];
 $page.= "</h1>";
 
-$page.= clean_log_button($string['clean_logs']);
+$page.= clean_log_button($string['clean_logs'], $user_id);
 
-if($_POST['clean_logs'] == '1') {
+if($_GET['clean_logs'] == '1') {
     do_clean_logs();
 }
 
