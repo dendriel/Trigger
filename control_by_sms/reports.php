@@ -119,7 +119,7 @@ $page.= "<div align=\"center\">";
 $page.= "<table border=\"2\">";
 $page.= "<tr>";
 $page.= "<td><a href=\"reports.php?req_type=$ACTIVE&user_id=$user_id\"><u>$active_b</u></u></a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$CANCELED&user_id=$user_id\"><u>$canceled_b</u></a></td>";
+//$page.= "<td><a href=\"reports.php?req_type=$CANCELED&user_id=$user_id\"><u>$canceled_b</u></a></td>";
 $page.= "<td><a href=\"reports.php?req_type=$FAILED&user_id=$user_id\"><u>$failed_b</u></a></td>";
 $page.= "<td><a href=\"reports.php?req_type=$SENT&user_id=$user_id\"><u>$sent_b</u></a></td>";
 $page.= "</tr>";
