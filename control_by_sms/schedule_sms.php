@@ -154,7 +154,7 @@ if($con->statusCon() == -1) {
     for ($index = 0; $index <= $contacts_len; $index++) {
         $contacts_list .= $contacts_raw[$index];
 
-        if ($index < $contacts_len-1) {
+        if ($index < $contacts_len) {
             $contacts_list .= ',';
         }
     }
@@ -187,10 +187,13 @@ if($con->statusCon() == -1) {
     } else {
         $orig_ext = pg_fetch_row($orig_ext);
         $orig_ext = $orig_ext[0];
+        $contacts_list .= $orig_ext;
     }
 
+    // add origin extension to destination list //
+
     // submit all //
-   //echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts . "<br />" . $orig_ext;
+   echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts . "<br />" . $orig_ext;
 
     if (($origin_ts != null) and ($contacts_list != null) and ($message != null)) {
         try {

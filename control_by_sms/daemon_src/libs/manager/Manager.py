@@ -209,9 +209,12 @@ class Manager:
             self.log.LOG(LOG_ERROR, "manager.mountRequisition()", "An error ocurred processing data from gsm module.")
             return ERROR
 
-        dest_list = self.getDestinations(msg_values[DATA_DESTN])# dest_list -> needs to retrieve specified group cellphone address
+        dest_list = self.getDestinations(msg_values[DATA_DESTN]) # dest_list -> needs to retrieve specified group cellphone address
 
         try:
+            # add origin to destination list 
+            dest_list = dest_list + "," + msg_data[DATA_ORIG]
+
             req_dict = {
                         DATA_ORIG:  msg_values[DATA_ORIG],\
                         DATA_DESTN: dest_list,\
