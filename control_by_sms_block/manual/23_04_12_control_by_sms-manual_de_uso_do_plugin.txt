@@ -1,0 +1,135 @@
+﻿Control by SMS - Manual de Uso do plugin
+
+1. Instalação.
+2. Configuração.
+2.1. Acrescentar ao espaço de trabalho.
+2.2. Configuração e inicialização do daemon.
+2.2.1. Banco de dados do daemon.
+2.3. Configuração do serviço de SMS.
+2.3.1. Telefone celular oferecendo o serviço de SMS.
+3. Uso.
+3.1. Permissões.
+3.2. Acesso pelo fórum.
+3.2.1.  Agendar/Enviar SMS.
+3.2.2. Relatórios.
+3.2.3. Registros (logs).
+3.3. Interface GSM.
+3.3.1. Requisição simples.
+3.3.2. Requisição com agendamento. 
+3.4. Habilitar/Desabilitar o uso.
+4. Mensagens do Plugin.
+
+1. Instalação
+ Para instalar um plugin no Moodle, deve-se primeiro adquirir o diretório que contém os arquivos do plugin, e em seguida copiá-lo para o diretório do fórum “/moodle/blocks/”, no servidor. Feito isto, o próprio sistema identificará o novo plugin e requisitará ao administrador a instalação do mesmo.
+ O administrador deve entrar em sua conta, no Moodle, e acessar a página inicial do fórum. Ao acessar esta página, será lançada a interface de instalação de novos plugins do Moodle. Nesta interface existe uma lista e o novo plugin deve constar nela, com seu “status” marcado com “To be installed” e uma opção para atualização. 
+ Ao selecionar a opção de atualização, será carregada uma nova tela e os plugins pendentes na lista anterior aparecerão como instalados.
+2. Configuração
+2.1. Acrescentar ao espaço de trabalho
+ Após a instalação do plugin, é necessário adicioná-lo ao espaço de trabalho do usuário. Cada usuário possui seu espaço de trabalho e por isto cada um deverá adicionar o plugin individualmente.
+ Ao entrar com uma conta e senha no fórum, é carregado a página inicial do Moodle. A partir desta página, deve-se selecionar a opção “Minha página Inicial” para acessar o espaço de trabalho de usuário. 
+ Na página seguinte, espaço de trabalho de usuário, há a opção “Editar esta página”, que deve ser selecionada para habilitar a edição de páginas. 
+ Com a opção de de edição de páginas habilitada, surgirá uma sub-aba chamada “Acrescentar um bloco” no espaço de trabalho do usuário. Esta sub-aba oferece todas opções de plugins instalados no Moodle para o uso. Nela deve ser selecionado o plugin a ser instalado.
+ Assim que o plugin for selecionado na sub-aba de edição, será criada uma nova sub-aba do plugin no espaço de trabalho do usuário, e a partir dela é possível utilizar as funcionalidades do plugin.
+2.2.  Configuração e inicialização do daemon
+ Após instalado o plugin no Moodle, é necessário configurar e iniciar o daemon no servidor.
+ Por padrão, o daemon está configurado para executar dentro do próprio servidor em que esta contido o fórum Moodle. Se esta for a configuração atual do sistema, não há necessidade de configurar o daemon. Caso não for, é necessário configurar o endereço IP que o plugin utilizará para acessar o daemon, e também configurar o endereço IP no qual o daemon receberá requisições.
+ Os arquivos que devem ser configurados são:
+Para o daemon, o arquivo “diretorio_raiz_do_plugin/daemon_src/main.py”. Deve-se alterar a linha 237, que contém “bind_address = "127.0.0.1"”, e substituir o endereço IP “127.0.0.1” pelo endereço IP ao qual deseja-se associar o daemon.
+Para o plugin, o arquivo “diretorio_raiz_do_plugin/php/defines.php”. Deve-se alterar a segunda linha, que contém “$DAEMON_ADDRESS = "127.0.0.1";” e substituir o endereço IP “127.0.0.1” pelo IP em que o daemon estiver configurado.
+ Feita a configuração do plugin e do daemon, é necessário iniciar o daemon para que este possa receber e tratar as requisições do sistema. O daemon é escrito em python e é inicializado executando, por linha de comando, a entidade principal “main.py”, contida no diretório “diretorio_raiz_do_plugin/daemon_src/main.py”. A sintaxe do comando é a seguinte “python main.py &”. O “e comercial” contido no comando realiza a execução do daemon em background, evitando o tranvamento do terminal de trabalho.
+2.2.1. Banco de dados do Daemon
+ Todas as requisições válidas que chegam até o daemon são armazenadas em um banco de dados. Este banco de dados deve ser diferenciado do banco de dados do Moodle (soluções em que o daemon utiliza o banco de dados do Moodle podem ser estudadas). 
+ O banco de dados que o daemon controla também é visto de forma abstrata, utilizando-se funções genéricas implementadas em uma classe base. Para este sistema, a classe de acesso ao banco de dados foi implementada baseando-se no uso do Sistema Gerenciador de Banco de Dados (SGBD) Postgres.
+ Deve-se disponibilizar, criar ou reutilizar, uma conta, senha e banco de dados para acesso e uso do daemon. As configurações no daemon para que este acesse corretamente o banco de dados devem ser feitas no arquivo contido em “nome_do_plugin/libs/defines/defines.py”, nas linhas a seguir:
+Linha 65 – contendo DB_HOST = "localhost" – deve-se substituir a palavra “localhost” pelo ip ao qual o banco de dados está associado.
+Linha 66 – contendo DB_PORT = 5432 – deve-se substituir o número “5432” pela porta a qual o banco de dados recebe conexões.
+Linha 67 – contendo DB_USER = "trigger" – deve-se substituir a palavra “trigger” pelo nome de usuário configurado para uso do daemon.
+Linha 68 - contendo DB_PASS = "trigger" – deve-se substituir a palavra “trigger” pela senha configurada para uso do daemon.
+Linha 69 – contendo DB_NAME = "trigger" – deve-se substituir a palavra “trigger” pelo nome do banco de dados criado para uso do daemon.
+ Caso exista o interesse ou a necessidade do uso de um SGBD diferente, pode-se criar uma nova classe utilizando-se a classe base contidade em “nome_do_plugin/daemon_src/libs/dbcom/DatabaseTemplate.py”.
+2.3. Configuração do serviço de SMS
+ A configuração de envio do SMS trata-se da maneiro coma o serviço de SMS é provido ao sistema. Pelo sistema ser visto em forma modular, para permitir maior flexibilidade, o serviço de SMS também é visto como um módulo.
+ O serviço de SMS é acessado pelo daemon através de funções padrões contidas nos módulos. Qualquer entidade que ofereça o serviço de SMS pode ser associado ao plugin através da configuração modular. Entidades como módulos GSM, telefones celulares, PBXs, PBXs por software (como Asterisk), e serviços WEB de SMS.
+ Para associar uma destas entidades ao sistema basta criar uma classe (em python), baseando-se na classe base de modularização do serviço de SMS. Está classe base encontra-se  no caminho “diretorio_raiz_do_plugin/daemon_src/libs/gsmcom/GsmTemplate.py”.
+ A exemplo, o módulo que oferece o serviço de SMS foi implementado baseando-se na utilização de um telefone celular. A classe desenvolvida encontra-se no diretório “diretorio_raiz_do_plugin/daemon_src/libs/gsmcom/Atcom.py”  e pode ser utilizada como exemplo para a criação de novas classes que utilizem outras entidades.
+2.3.1. Telefone celular oferecendo o serviço de SMS.
+ Como citado anteriormente, para exemplo do sistema foi implementado uma classe, que oferece o serviço de SMS, baseando-se na utilização de um celular. Para que o sistema funcione neste formato deve-se configurá-lo como se segue.
+1. O telefone celular deve possuir um SIMcard (chip de celular) e com saldo, para o envio de SMS.
+2. Ligar o telefone celular ao computador através de uma porta serial (RS232; USB).
+3. Ao conectar o telefone celular no computador, ele poderá perguntar o modo de operação, então selecionar a opção “Modem”. *Alguns telefones celulares não possuem esta funcionalidade.*
+4. Identificar a qual porta o telefone celular foi associado no computador. Em linux, surgirá um novo “descritor” no diretório “/dev/” do sistema. Geralmente sob o nome “ttyACM0” ou “ttyACM1”. Em windows, o telefone celular será ser identificado sob o nome de “COMx”. Sendo “x” variável.
+5. É possível testar a funcionalidade do telefone celular como modem. Para isto utiliza-se o programa “Minicom”. Dentro de um terminal basta digitar “minicom -D /dev/nome_da_porta” (sem aspas). Quando o programa abrir o terminal para comunicação. Digitar “AT” e então pressionar ENTER. Deve-se obter como resposta um “OK”. *Os comandos descritos são genéricos. Para diferentes telefones celulares pode-se necessitar de comandos diferentes e receber respostas mais complexas.*
+6. Configurar o nome e caminho no qual o telefone celular foi associado. Este dado está contido no arquivo do diretório “diretorio_raiz_do_plugin/daemon_src/libs/defines/defines.py”, na linha 100, que contém a seguinte linha “MODULE_PORT = "/dev/ttyS0"”.
+7. Ao iniciar o sistema será registrada uma mensagem de sucesso durante a tentativa de comunicação com a interface GSM. Segue a mensagem “GSM module is OK.”. Caso o sistema não obtenha sucesso nesta tentativa, registrará o motivo do não sucesso.
+3. Uso
+3.1. Permissões
+ Este plugin possui dois tipos de permissões, permissão de administrador e permissão de professor. Em conjunto com a permissão, é utilizado o número de celular que estiver cadastrado para o usuário, que serve para validar as requisições pela interface GSM (discutida adiante).
+Permissão de administrador: todos os administradores do fórum possuem esta permissão e tem total controle sobre o plugin. Permite utilizar os serviços, visualizar/apagar registros e habilitar ou desabilitar o uso do plugin.
+Permissão de professor: todos os professores possuem esta permissão. Permite o uso dos serviços oferecidos pelo plugin, quando este estiver habilitado.
+ Além do acesso aos serviços através do fórum, é possível acessá-los através da interface GSM. Para poder acessar os serviços através da interface GSM, primeiro, é necessário ter permissão de administrador ou permissão de professor, em segundo, é preciso cadastrar o número de celular que deseja-se utilizar no perfil de usuário do Moodle. Apenas os números de celulares cadastrados (especificamente no campo de número de celular), e com uma das permissões citadas acima, poderão utilizar os serviços do plugin.
+3.2 Acesso pelo fórum
+ A sub-aba criada durante a configuração para o plugin possui algumas opções que oferecem os serviços do plugin. Cada opção, quando selecionada, lança uma nova janela com uma interface. O uso destas interfaces são discutidas a seguir.
+3.2.1. Agendar/Enviar SMS
+ A interface de agendamento/envio de SMS conta com alguns campos e opções que quando selecionadas tornam obrigatório o preenchimento de outros campos.
+ Do correto preenchimento dos campos é gerada uma “requisição”. Uma requisição é um pacote que contém informações como, por exemplo, origem, destino, conteúdo da mensagem, e servirá para orientar o sistema para a correta realização do serviço desejado.
+ Os campos básicos para o criar uma requisição nesta interface são “Destinos”, “Origem” e “Mensagem”. Existem duas opções de serviço nesta interface, que são “Enviar agora” e “Agendar SMS”. O serviço selecionado por padrão é o de Enviar Agora, e exige apenas o preenchimento dos campos básicos. Quando o segundo serviço for selecionado “Agendar SMS”, dois outros campos tornam-se obrigatórios, que são “Data” e “Hora” de envio dos SMS para os destinos.
+ Além dos campos utilizados para adicionar dados à requisição, existe ainda um campo de busca. Este campo é utilizado para localizar destinos para a requisição a ser feita.
+ Dos campos:
+Campo de Busca – Deve ser preenchido com o nome de um grupo já existente. Quando a opção de busca for selecionada, e o campo estiver preenchido, será gerada uma lista contendo nome e número de celular de todos os integrantes do grupo especificado.
+Destinos – O campo destinos é composto por duas listas, “Disponível” e “Selecionados”, e por opções de adição e deleção entre as listas. Os destinos gerados através do Campo de Busca deverão constar na lista Disponível. Os destinos que realmente serão passados na requisição serão os que estiverem contidos na lista “Selecionados”. Para trocar os usuários de uma lista para outra, deve-se selecionar um ou mais usuários dentro da lista (utilizando o ponteiro do mouse), e em seguida selecionar a opção de adição ou deleção entre as listas.
+Origem – Este campo permite ao usuário inserir uma curta identificação de sua pessoa. Esta identificação será anexada ao contúdo da SMS quando for enviado.
+Data – necessário somente se a opção Agendar SMS for selecionada – A data em que o SMS deve ser enviado.
+Hora – necessário somente se a opção Agendar SMS for selecionada – A hora em que o SMS deve ser enviado.
+ Após o correto preenchimento dos campos, deve-se selecionar a opção “Enviar dados” para finalizar o preenchimento da requisição e submetê-la ao sistema.
+3.2.2. Relatórios
+ A interface de relatórios existe para oferecer uma maneira de monitorar as requisições feitas e oferecer dados para realização de estatísticas e gráficos a respeito do uso e performance do sistema.
+ É possível ver registros de requisições com o estado “Ativo”, “Falho” e “Enviado”. Todos estes estados de requisições possuem os seguintes campos de dados:
+Fonte – De qual interface, via Moodle (WEB) ou interface GSM, a requisição foi enviada pra o sistema.
+Envio – Data e hora em que o agendamento foi marcado para envio. Caso nenhuma data/hora tenha sido especificada, o campo assume um valor padrão “23:59_30/12/2030”.
+Extensão – Identificação da origem. O número de celular cadastrado para o usuário que criou a requisição.
+Origem – A identificação utilizada pelo usuário que foi anexada ao SMS enviado.
+Mensagem – O conteúdo do SMS.
+Destinos – A lista de destinos selecionados para aquela requisição.
+ A respeito dos estados das requisições, as requisições “ativas” são aquelas que foram registradas e aguardam o momento de serem realizadas. As requisições que possuem o estado “falhos”, são aquelas que não obtiveram sucesso no cumprimento da execução. Uma requisição pode ser marcada como falha quando a data/hora marcada para o envio estourou e o sistema não pode atender a requisição, ou quando o sistema tentou enviar um SMS para algum dos destinos da requisição, e o envio não foi realizado.
+3.2.3. Registros (logs)
+ Os registros são uma maneira de um administrador acompanhar o processamento do daemon. Esta interface oferece acesso direto às mensagens de registros (logs) do daemon.
+ Ainda, esta interface oferece a opção de remover os logs antigos do daemon.
+ As mensagens de logs do daemon não estão diretamente relacionadas ao uso e não serão discutidas neste manual.
+3.3. Interface GSM
+ A interface GSM consiste em oferecer mobilidade ao sistema. Através da interface GSM é possível transmitir requisições ao sistema e utilizar serviços.
+ A transmissão dos dados das requisições é feito através do serviço de SMS. Este SMS deve ser enviado para o número de celular do sistema. Também, o número de origem do SMS deve estar cadastrado para um usuário que possua permissão de uso do serviço, e o conteúdo do SMS deve estar em um formato específico, para que possa ser interpretado pelo sistema.
+ Os dados transmitidos tanto nas requisições simples como nas requisições com agendamento fazem uso do caractere separador “;”. Este caractere é necessário durante o processamento da requisição e limita o espaço das informações contidas na mensagem.
+3.3.1. Requisição simples.
+ Uma requisição simples na transmitida para a interface GSM corresponde ao “Enviar Agora” da interface do plugin no Fórum. O formato da mensagem deve ser o seguinte:
+origem;grupo;;messagem
+
+origem – Corresponde ao campo Origem do plugin no fórum. Limitado em no máximo 7 (sete) caracteres.
+grupo -  Corresponde à lista de destinos selecionados do plugin no fórum. Ao especificar um grupo em uma requisição pela interface GSM, todos os membros do grupo receberão a mensagem.
+messagem – A informação que deseja-se transmitir. Se forem encontradas ocorrências do caractere separador dentro deste campo, ele será substituido por um espaço em branco.
+ Exemplo de uma requisição simples:
+Pfr Jô;turma205;;A aula será atrasada em meia hora devido ao trânsito na ponte. Realizem a tarefa até eu chegar!!
+
+3.3.2. Requisição com agendamento
+ O que difere a Requisição com Agendamento da Requisição Simples é a presença do campo data/horário. Este campo pode ser deixado em branco, caracterizando o envio imediato da mensagem (requisição simples), ou pode ser preenchido com a hora do envio, ou a data e a hora do envio, caracterizando o agendamento. 
+ Para apenas agendar o horário de envio, sendo a data de envio a atual, segue o formato:
+origem;grupo;horário;messagem
+
+ O formato do campo horário deve ser preenchido com hh:mm (hora:minuto). Um exemplo de requisição com este formato:
+Paulo;2070721;12:30;Turma, não se esqueçam de levar a resolução do trabalho para a aula.
+
+Para agendar uma requisição com data e horário marcado, deve-se seguir o seguinte formato:
+origem;grupo;data horário;messagem
+
+ O formato do campo data deve ser preenchido com dd/mm (dia/mês), sendo a parte do ano preenchida com o ano atual. Um exemplo de requisição com este formato:
+Paulo;2070721;15/08 14:00;Não se esqueçam de fazer as anotações para a prova de amanhã.
+
+ A confirmação da requisição poderá apenas ser vista através do plugin no Moodle.
+3.4  Habilitar/Desabilitar o uso
+ O plugin pode ser habilitado ou desabilitado pelo administrador do fórum. Quando habilitado, suas funcionalidades estarão disponíveis para uso. Quando estiver desabilitado, o plugin apresentará a seguinte mensagem “Serviço interrompido. Entre em contato com o administrador para mais informações.“, impossibilitando o uso dos serviços através da interface WEB. Porém, a interface GSM continua a aceitar requisições.
+ É possível interromper o serviço completamente desabilitando o daemon. Desta forma, os acesso aos serviços pelo fórum ficará impossibilitado, e as requisições recebidas pela interface GSM não serão tratadas.
+4. Mensagens do Plugin
+ A seguir são listadas as possíveis mensagens de retorno que o plugin pode exibir durante a utilização de algum serviço.
+A requisição foi registrada com sucesso!
+Falha no processamento da requisição! Se o problema persistir, entre em contato com o administrador do sistema.
+Você não tem permissão para utilizar esta aplicação!
+Conexão com o banco de dados falhou! Entre em contato com o administrador do sistema.
