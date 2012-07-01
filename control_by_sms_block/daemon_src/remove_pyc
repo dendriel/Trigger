@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# do with a makefile #
+
+echo "rm -f ./*.pyc"
+rm -f ./*.pyc
+echo "rm system.out"
+rm -f system.out
+echo "rm -rf .get_destinations.stream"
+rm -rf .get_destinations.stream
+echo "cd libs; rm -f *.pyc"
+cd libs; rm -f *.pyc
+echo "cd log; rm -f *.pyc;"
+cd log; rm -f *.pyc;
+echo "cd ../defines; rm -f *.pyc"
+cd ../defines; rm -f *.pyc
+echo "cd ../dbcom; rm -f *.pyc"
+cd ../gsmcom; rm -f *.pyc
+echo "cd ../gsmcom; rm -f *.pyc"
+cd ../dbcom; rm -f *.pyc
+echo "cd ../manager; rm -f *.pyc"
+cd ../manager; rm -f *.pyc
+
