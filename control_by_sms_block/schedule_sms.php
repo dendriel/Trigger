@@ -193,7 +193,7 @@ if($con->statusCon() == -1) {
     // add origin extension to destination list //
 
     // submit all //
-   echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts . "<br />" . $orig_ext;
+   //echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts . "<br />" . $orig_ext;
 
     if (($origin_ts != null) and ($contacts_list != null) and ($message != null)) {
         try {
