@@ -251,7 +251,7 @@ class Atcom(GsmTemplate):
 
         SMS_HEADER_FIELDS = 5 # header + command status (OK/ERROR)
         SMS_MSG_OFFSET = 4
-
+        #TODO CRITICAL - Treat messages that the number of source has country code
         try:
             self._read()
             self._send("AT+CMGR=%d" % msg_index)
