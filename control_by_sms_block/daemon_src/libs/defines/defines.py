@@ -19,15 +19,17 @@ TAG_BLOW    = "BLOW"
 TAG_PART    = "PART"
 
 # REQUISITION DATA #
-DATA_ORIG   = "orig"    # A name to identify the origin.                                 #
-DATA_DESTN  = "dest"    # The destination numbers.                                       #
-DATA_MSG    = "msg"     # The message to be sent.                                        #
-DATA_OPER   = "oper"    # An operator indicator. *See operator definitions* *not in use* #
-DATA_SEND   = "send"    # A flag that informs if the requisition is to be executed now.  #
-DATA_BLOW   = "blow"    # The date/time when the requisition will be sent.               #
-DATA_STATUS = "stat"    # The state of the requisition. *See requisition states*         #
-DATA_ID     = "id"      # The unique identifier of the requisition.                      #
-DATA_DATE   = "date"    # When the requisition was sent to the system. *not in use*      #
+DATA_ORIG   = "orig"    # A name to identify the origin.                                  #
+DATA_DESTN  = "dest"    # The destination numbers.                                        #
+DATA_MSG    = "msg"     # The message to be sent.                                         #
+DATA_OPER   = "oper"    # An operator indicator. *See operator definitions* *not in use*  #
+DATA_SEND   = "send"    # A flag that informs if the requisition is to be executed now.   #
+DATA_BLOW   = "blow"    # The date/time when the requisition will be sent.                #
+DATA_STATUS = "stat"    # The state of the requisition. *See requisition states*          #
+DATA_ID     = "id"      # The unique identifier of the requisition.                       #
+DATA_DATE   = "date"    # When the requisition was sent to the system. *not in use*       #
+DATA_SRC    = "src"     # From where, xml or gsm interface, the requisition was received. #
+DATA_EXTEN  = "ext"     # The extension cellnumber from the requester.                    #
 
 # REQUISITION STATES #
 ACTIVE   = 0
@@ -40,6 +42,10 @@ VIVO  = 0
 OI    = 1
 TIM   = 2
 CLARO = 3
+
+# DATA SOURCE #
+XML = 10
+GSM = 20
 
 # LOG LEVELS #
 LOG_INFO     = 10
@@ -87,7 +93,7 @@ EMPTY = ""
 NULL_LIST = []
 MIN_TIME_TO_SEND = 10 # The minimum "at least" time to send #
 MAX_TIME_TO_SEND = -60 # The maximum time before the blow to send #
-SEPARATOR_CHAR = '@'
+SEPARATOR_CHAR = ';'
 SEPARATOR_CHAR_FOR_DB = ','
 MAX_ORIG_LEN = 7       # Maximum string length to identify the origin            #
 MAX_DEST_CODE_LEN = 7   # Maximum string length to identify the destination group #

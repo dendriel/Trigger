@@ -5,7 +5,6 @@ include('./php/defines.php');
 include('./php/interface.php');
 include("./lang/en/block_control_by_sms.php");
 
-
 $active_b = $string['active'];
 $canceled_b = $string['canceled'];
 $failed_b = $string['failed'];
@@ -45,6 +44,10 @@ if ($user_id != null) {
         }
     }
     $con->close();
+
+} else {
+    echo $string['not_allowed'];
+    exit(0);
 }
 
 $req_type = (int)$_GET['req_type'];
@@ -52,6 +55,7 @@ $req_type = (int)$_GET['req_type'];
 if(($req_type) >= 0 or ($req_type <=3)) {
 
     $req_list = get_requisitions($req_type);
+
     switch($req_type) {
 
         case $ACTIVE: 
@@ -97,7 +101,7 @@ th {
 }
 td {
     border-width: 1px;
-    padding: 22x;
+    padding: 5px;
     border-style: dotted;
     border-color: gray;
     -moz-border-radius: ;
@@ -114,22 +118,25 @@ $page.= "</h1>";
 $page.= "<div align=\"center\">";
 $page.= "<table border=\"2\">";
 $page.= "<tr>";
-$page.= "<td><a href=\"reports.php?req_type=$ACTIVE\">$active_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$CANCELED\">$canceled_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$FAILED\">$failed_b</a></td>";
-$page.= "<td><a href=\"reports.php?req_type=$SENT\">$sent_b</a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$ACTIVE&user_id=$user_id\"><u>$active_b</u></u></a></td>";
+//$page.= "<td><a href=\"reports.php?req_type=$CANCELED&user_id=$user_id\"><u>$canceled_b</u></a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$FAILED&user_id=$user_id\"><u>$failed_b</u></a></td>";
+$page.= "<td><a href=\"reports.php?req_type=$SENT&user_id=$user_id\"><u>$sent_b</u></a></td>";
 $page.= "</tr>";
 $page.= "</table></div>";
 
-$page.= "<h2 align=\"center\"><u>$header2</u></h2>";
+$page.= "<h2 align=\"center\" ><u>$header2</u></h2>";
+#$page.= "<h2 align=\"center\" ><span style=\"color:$th_color\">$header2</span></h2>"; // colored title mode //
 
 $table.= "<div align=\"center\">";
 $table.= "<table border=\"1\">";
 
 $table.= "<tr style=\"background-color:$tr_color;\">";
+$table.= "<th>" . $string['source'] . "</th>";
+$table.= "<th>" . $string['blow_col'] . "</th>";
+$table.= "<th>" . $string['extension'] . "</th>";
 $table.= "<th>" . $string['origin_col'] . "</th>";
 $table.= "<th>" . $string['message_col'] . "</th>";
-$table.= "<th>" . $string['blow_col'] . "</th>";
 $table.= "<th>" . $string['destination_col'] . "</th>";
 $table.= "</tr>";
 
@@ -137,15 +144,19 @@ $table.= "</tr>";
 if ($req_list != null) {
 
     for ($index=0; $index < count($req_list); $index++) {
+
         $table.= "<tr style=\"background-color:$th_color\">";
+        if($req_list[$index][$SRC] == '10') $source = "WEB"; else $source = "GSM";
+        $table.= "<td>" . $source . "</td>";
+        $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
+        $table.= "<td>" . $req_list[$index][$EXTEN] . "</td>";
         $table.= "<td>" . $req_list[$index][$ORIG] . "</td>";
         $table.= "<td>" . treat_str($req_list[$index][$MSG]) . "</td>";
-        $table.= "<td>" . mount_date($req_list[$index][$BLOW]) . "</td>";
         $table.= "<td>" . treat_str($req_list[$index][$DESTN]) . "</td>";
         $table.= "</tr>";
     }
 } else {
-    echo $string['daemon_error'];
+    //echo $string['daemon_error']; // is not an error.
 }
 
 $table.= "</table></div>";

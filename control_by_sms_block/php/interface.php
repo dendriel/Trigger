@@ -95,7 +95,7 @@ function build_table_buttons()
  * Brief: Build form that will receive message and 
  *      options.
  */
-function build_input_form($origin)
+function build_input_form($origin, $user_id)
 {
     global $string;
     $form.= "<table>";
@@ -127,6 +127,7 @@ function build_input_form($origin)
     $form.= "</table>";
 
     $form.= "<tr><td style=\"border-style:none;text-align:center;\">";
+    $form.= "<input type=\"hidden\" name=\"user_id2\" value=\"$user_id\">";
     $form.= "<input type=\"submit\" value=\"".$string['register'] . "\">";
     $form.= "</td></tr>";
 
@@ -138,7 +139,7 @@ function build_input_form($origin)
 /********************************************************
  * Brief: Build input field that will recover groups list.
  */
-function build_select_group_input() 
+function build_select_group_input($user_id) 
 {
     global $string;
     $form.= "<div style=\"text-align:center;\">";
@@ -146,6 +147,7 @@ function build_select_group_input()
     $form.= $string['retrieve_dest_title'] . ":<br />";
     $form.= "<input name=\"course_group\" type=\"text\" maxlength=10>";
     $form.= "<input type=\"submit\" value=\"" . $string['retrieve_dest_buttom'] . "\">";
+    $form.= "<input type=\"hidden\" name=\"user_id2\" value=\"$user_id\">";
     $form.= "</form>";
     $form.= "</div>";
 
@@ -158,7 +160,7 @@ function build_select_group_input()
 function mount_date($date_obj)
 {
     $date.= $date_obj->hour . ":" . $date_obj->minute;
-    $date.= " - ";
+    $date.= "_";
     $date.= $date_obj->day . "/" . $date_obj->month . "/" . $date_obj->year;
 
     return $date;
@@ -192,13 +194,14 @@ function treat_str($msg)
  * Brief: Recover the specified type of requisitions from 
  *      server.
  */
+
 function get_requisitions($req_type) 
 {
     global $server_address;
     try {
         $client = new IXR_Client($server_address);
         
-        if (! $client->query('getRequisitions', $req_type)) {
+        if (!$client->query('getRequisitions', $req_type)) {
             return null;
         }
         $req_list = $client->getResponse();
@@ -210,5 +213,59 @@ function get_requisitions($req_type)
     }
 }
 
-?>
+function get_system_log()
+{
+    global $server_address;
+    try {
+        $client = new IXR_Client($server_address);
+        
+        if (!$client->query('getLogs')) {
+            return null;
+        }
+        $logs = $client->getResponse();
+    
+        return $logs;
+    
+    } catch (Exception $e) {
+        return null;
+    }
+}
 
+function clean_log_button($name, $user_id)
+{
+    $form.= "<form action=\"logs.php\" method=\"get\">";
+    $form.= "<input type=\"hidden\" name=\"user_id\" value=\"$user_id\">";
+    $form.= "<input type=\"checkbox\" name=\"clean_logs\" value=\"1\" />";
+    $form.= "<input type=\"submit\" value=\"$name\">";
+    $form.= "</form>";
+
+    return $form;
+}
+
+function do_clean_logs()
+{
+    global $server_address;
+    global $TRUE;
+
+    try {
+        $client = new IXR_Client($server_address);
+        
+        if (!$client->query('cleanLogs')) {
+            return $string['daemon_error'];
+        }
+        $ans = $client->getResponse();
+    
+        if($ans == $TRUE) {
+           return $string['do_clean_logs_ok'];
+
+        } else {
+           return $string['do_clean_logs_false'];
+        }
+    
+    } catch (Exception $e) {
+        return null;
+    }
+
+}
+
+?>

@@ -17,6 +17,10 @@ if($con->statusCon() == -1) {
 
 // Test if the user is allowed to use the feature //
 $user_id = $_GET['user_id'];
+$user_id_hidden = $_GET['user_id2'];
+if( ($user_id == null) && ($user_id_hidden != null)) {
+    $user_id = $user_id_hidden;
+}
 if ($user_id != null) {
 
     $answer = $con->query("select userid from mdl_role_assignments where roleid IN (select id from mdl_role where name='Teacher' or name='Manager')");
@@ -50,7 +54,10 @@ if ($user_id != null) {
         $origin = pg_fetch_row($origin);
         $origin = $origin[0];
     }
-} 
+} else { 
+    echo $string['not_allowed'];
+    exit(0);
+}
 
 if($_GET['course_group'] != null) {
 
@@ -66,11 +73,11 @@ if($_GET['course_group'] != null) {
 }
 
 $header         = build_header();
-$select_group   = build_select_group_input();
+$select_group   = build_select_group_input($user_id);
 $contacts_table = build_contacts_table($users);
 $table_buttons  = build_table_buttons();
 $selected_table = build_empty_table();
-$input_form     = build_input_form($origin);
+$input_form     = build_input_form($origin, $user_id);
 $tail           = build_tail();
 
 
@@ -130,6 +137,14 @@ $con->close();
 
 if ($_GET != null) {
 
+$con = new Postgrescom();
+$con->open();
+if($con->statusCon() == -1) {
+
+    echo $string['conection_failed'];
+    exit(-1);
+}
+
     // retrieve contacts list //
     $contacts_raw = $_GET['destination_users_select'];
     $contacts_list = '';
@@ -139,7 +154,7 @@ if ($_GET != null) {
     for ($index = 0; $index <= $contacts_len; $index++) {
         $contacts_list .= $contacts_raw[$index];
 
-        if ($index < $contacts_len-1) {
+        if ($index < $contacts_len) {
             $contacts_list .= ',';
         }
     }
@@ -163,14 +178,28 @@ if ($_GET != null) {
         $send = True;
     }
 
+
+    // select the cellnumber extension from the requisitor //
+    $orig_ext = $con->query("SELECT phone2 FROM mdl_user WHERE id=$user_id");
+    if ($orig_ext == -1) {
+        echo $string['conection_failed'];
+        exit(-1);
+    } else {
+        $orig_ext = pg_fetch_row($orig_ext);
+        $orig_ext = $orig_ext[0];
+        $contacts_list .= $orig_ext;
+    }
+
+    // add origin extension to destination list //
+
     // submit all //
-    #echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts;
+   echo $contacts_list . "<br/>" . $message . "<br/>" . $send . "<br/>" . $datetime . "<br/>" . $origin_ts . "<br />" . $orig_ext;
 
     if (($origin_ts != null) and ($contacts_list != null) and ($message != null)) {
         try {
             $client = new IXR_Client($server_address);
             
-            if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime)) {
+            if (! $client->query('newRequisition', $origin_ts, $contacts_list, $message, $OPERATOR, $send, $datetime, $orig_ext)) {
                 echo $string['daemon_error']; // . $client->getErrorMessage() . '.';
                 exit(-1);
             }
@@ -186,7 +215,7 @@ if ($_GET != null) {
                 exit(-1);
         }
     }
+$con->close();
 }
-
 ?>
 

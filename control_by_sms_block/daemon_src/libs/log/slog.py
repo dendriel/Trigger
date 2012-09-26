@@ -52,7 +52,6 @@ class slog:
         try:
             file = open(path, "w")
             file.close()
-
             return OK
 
         except IOError as (errno, strerror):

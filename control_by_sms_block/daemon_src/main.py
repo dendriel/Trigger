@@ -41,6 +41,7 @@ class trigger:
         """
         Brief: Call all necessary functions and goes into the connection loop.
         """
+        self.log.LOG(LOG_INFO, "system", "+========================================================================")
         self.log.LOG(LOG_INFO, "system.start()", "Starting the system...")
 
         # Configure parameters and functions into XML-RPC Server #
@@ -116,6 +117,8 @@ class trigger:
             self.xmlrpc_server = SimpleXMLRPCServer((self.address, self.port))
             self.xmlrpc_server.register_function(self.newRequisition)
             self.xmlrpc_server.register_function(self.getRequisitions)
+            self.xmlrpc_server.register_function(self.getLogs)
+            self.xmlrpc_server.register_function(self.cleanLogs)
             self.xmlrpc_server.register_function(self.pingDaemon)
             #self.xmlrpc_server.register_function(self.systemHalt)
             self.xmlrpc_server.register_introspection_functions()
@@ -126,7 +129,7 @@ class trigger:
             self.log.LOG(LOG_ERROR, "system.start.configureXMLRPCServer()", "Failed to configure XML-RPC Server parameters. %s: %s" % (exc.__class__.__name__, exc))
             exit(-1)
 
-    def newRequisition(self, orig, destn, msg, oper, send, blow):
+    def newRequisition(self, orig, destn, msg, oper, send, blow, orig_ext):
         """
         Brief: Treat data and try to insert new register into the database.
         Param: orig The name that identifies the origin;
@@ -138,12 +141,16 @@ class trigger:
         Return: OK(0) if could register the requisition; ERROR(-1) otherwise.
         """
         try:
-            data_dict = {DATA_ORIG: orig,\
+            data_dict = {
+                         DATA_ORIG:  orig,\
                          DATA_DESTN: destn,\
-                         DATA_MSG: msg,\
-                         DATA_OPER: oper,\
-                         DATA_SEND: send,\
-                         DATA_BLOW: blow}
+                         DATA_MSG:   msg,\
+                         DATA_OPER:  oper,\
+                         DATA_SEND:  send,\
+                         DATA_BLOW:  blow,\
+                         DATA_EXTEN: orig_ext,\
+                         DATA_SRC:   XML\
+                        }
 
             if self.dbcom.registerRequisition(data_dict) == OK:
                 self.log.LOG(LOG_INFO, "system", "New requisition from RPC was registered.")
@@ -165,6 +172,32 @@ class trigger:
         """
         req_list = self.dbcom.getRequisitions(status)
         return req_list
+
+    def getLogs(self):
+        """
+        Brief: Recover and return the system log output.
+        Return: A string with all the system.log file content or
+                an ERROR message if was not possible to access
+                the log file.
+        """
+        try:
+            log = open(SYSTEM_LOG_PATH, "r")
+            log_content = log.read()
+            log.close()
+            return log_content
+
+        except:
+            return "Failed to access the log file."
+
+    def cleanLogs(self):
+        """
+        Brief: Clean the file log.
+        Return: OK if everything whent fine; ERROR otherwise.
+        """
+        if self.log.CLEAN(SYSTEM_LOG_PATH) == OK:
+            return OK
+        else:
+            return ERROR
 
     def pingDaemon(self):
         """
@@ -201,7 +234,7 @@ class trigger:
 #---------------------------------------------------------#
 if __name__ == "__main__":
 
-    bind_address = "192.168.0.155"
+    bind_address = "127.0.0.1"
     bind_port = SYSTEM_PORT
     system = trigger(bind_address, bind_port, GSM_ATCOM)
     system.start()

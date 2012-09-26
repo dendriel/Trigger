@@ -3,7 +3,11 @@
  */
 // Declaring valid date character, minimum year and maximum year
 var dtCh= "/";
+<<<<<<< HEAD
 var minYear=2012; //TODO retrieve current year.
+=======
+var minYear=2012;
+>>>>>>> 039f0b4d17bc928de8c76f9c752a13949baf8a72
 var maxYear=minYear+1;
 
 function isInteger(s){
@@ -46,12 +50,21 @@ function DaysArray(n) {
 function isDate(dtStr){
 
     var daysInMonth = DaysArray(12)
+<<<<<<< HEAD
     var pos1=dtStr.indexOf(dtCh)
     var pos2=dtStr.indexOf(dtCh,pos1+1)
     var strDay=dtStr.substring(0,pos1)
     var strMonth=dtStr.substring(pos1+1,pos2)
     var strYear=dtStr.substring(pos2+1)
     strYr=strYear
+=======
+    var pos1 = dtStr.indexOf(dtCh)
+    var pos2 = dtStr.indexOf(dtCh,pos1+1)
+    var strDay = dtStr.substring(0,pos1)
+    var strMonth = dtStr.substring(pos1+1,pos2)
+    var strYear = dtStr.substring(pos2+1)
+    strYr = strYear
+>>>>>>> 039f0b4d17bc928de8c76f9c752a13949baf8a72
 
     if (strDay.charAt(0)=="0" && strDay.length>1) strDay=strDay.substring(1);
     if (strMonth.charAt(0)=="0" && strMonth.length>1) strMonth=strMonth.substring(1);
@@ -62,6 +75,7 @@ function isDate(dtStr){
     day=parseInt(strDay);
     year=parseInt(strYr);
     if (pos1==-1 || pos2==-1){
+<<<<<<< HEAD
         alert("O formato da data deve ser: dd/mm/yyyy.");
         return false;
     }
@@ -80,6 +94,26 @@ function isDate(dtStr){
     if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
         alert("Entre com uma data válida.");
         return false;
+=======
+        alert("O formato da data deve ser: dia/m\u00EAs/ano")
+        return false
+    }
+    if (strDay.length<1 || day<1 || day>31 || (month==2 && day>daysInFebruary(year)) || day > daysInMonth[month]){
+        alert("Entre com um dia v\u00E1lido.")
+        return false
+    }
+    if (strMonth.length<1 || month<1 || month>12){
+        alert("Entre com um m\u00EAs v\u00E1lido.")
+        return false
+    }
+    if (strYear.length != 4 || year==0 || year<minYear || year>maxYear){
+        alert("Entre com um ano v\u00E1lido de quatro digitos. Ano m\u00E1ximo: " + maxYear)
+        return false
+    }
+    if (dtStr.indexOf(dtCh,pos2+1)!=-1 || isInteger(stripCharsInBag(dtStr, dtCh))==false){
+        alert("Entre com uma data v\u00E1lida.")
+        return false
+>>>>>>> 039f0b4d17bc928de8c76f9c752a13949baf8a72
     }
 return true;
 }
@@ -106,6 +140,7 @@ function valButton(btn) {
 */
 function isValidTime(timeStr)
 {
+<<<<<<< HEAD
 // Checks if time is in HH:MM:SS AM/PM format.
     var timePat = /^(\d{1,2}):(\d{2})?$/;
 
@@ -113,12 +148,21 @@ function isValidTime(timeStr)
 
     if (matchArray == null) {
         alert("O tempo deve estar no formato hora:minuto.");
+=======
+    var timePat = /^(\d{1,2}):(\d{2})?$/;
+    
+    var matchArray = timeStr.match(timePat);
+
+    if (matchArray == null) {
+        alert("A hora est\u00E1 em um formato inv\u00E1lido.");
+>>>>>>> 039f0b4d17bc928de8c76f9c752a13949baf8a72
         return false;
     }
     hour = matchArray[1];
     minute = matchArray[2];
     second = "00";
     ampm = null;
+<<<<<<< HEAD
 
     if (second == "") {
         second = null;
@@ -132,6 +176,19 @@ function isValidTime(timeStr)
     }
     if (minute<0 || minute > 59) {
         alert ("Minuto inválido.");
+=======
+    
+    if (second=="") { second = null; }
+    if (ampm=="") { ampm = null }
+    
+    if (hour < 0  || hour > 23) {
+        alert("Entre com uma hora entre 00 e 23.");
+        return false;
+    }
+
+    if (minute<0 || minute > 59) {
+        alert ("Entre com minutos entre 0 e 59.");
+>>>>>>> 039f0b4d17bc928de8c76f9c752a13949baf8a72
         return false;
     }
 
